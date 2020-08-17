@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "712001195279",
+    "firebase_url": "https://habits-debug-c3d50.firebaseio.com",
+    "project_id": "habits-debug-c3d50",
+    "storage_bucket": "habits-debug-c3d50.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:712001195279:android:dbc3d1be73457e86a9827a",
+        "android_client_info": {
+          "package_name": "com.janbina.habits.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "712001195279-rcqdhmntg0rpr8amrsi0oacrdk2s5v08.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.janbina.habits.debug",
+            "certificate_hash": "becca237260520fbe7ff6f10d003c8e42010db84"
+          }
+        },
+        {
+          "client_id": "712001195279-vq3jrro3a0u6dq43tna1isnis709qnjd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1wkKq-Elp1IMsaVNL8ADtB60MtWbBWv8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "712001195279-vq3jrro3a0u6dq43tna1isnis709qnjd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
