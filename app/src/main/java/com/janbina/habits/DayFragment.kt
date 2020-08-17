@@ -6,6 +6,8 @@ import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import dagger.hilt.android.AndroidEntryPoint
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @AndroidEntryPoint
 class DayFragment : Fragment(R.layout.fragment_day) {
@@ -13,15 +15,18 @@ class DayFragment : Fragment(R.layout.fragment_day) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.findViewById<TextView>(R.id.text).text = argOr(ARG_DAY, "")
+        val daysSinceEpoch = argOr(ARG_DAY, 0)
+
+        view.findViewById<TextView>(R.id.text).text = LocalDate.ofEpochDay(daysSinceEpoch.toLong()).format(
+            DateTimeFormatter.ISO_LOCAL_DATE)
     }
 
     companion object {
         const val ARG_DAY = "ARG_DAY"
 
-        fun create(day: String) = DayFragment().apply {
+        fun create(daysSinceEpoch: Int) = DayFragment().apply {
             arguments = bundleOf(
-                ARG_DAY to day
+                ARG_DAY to daysSinceEpoch
             )
         }
     }
