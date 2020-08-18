@@ -4,10 +4,11 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.janbina.habits.repository.HabitsRepository
 import java.time.LocalDate
 
 class HomeViewModel @ViewModelInject constructor(
-    private val repo: SomeRepository
+    private val habitsRepository: HabitsRepository
 ) : ViewModel() {
 
     private val _state = MutableLiveData(State())
@@ -15,6 +16,10 @@ class HomeViewModel @ViewModelInject constructor(
 
     fun dateChanged(newDate: LocalDate) {
         _state.value = _state.value!!.copy(selectedDate = newDate)
+    }
+
+    fun createHabit(name: String) {
+        habitsRepository.createHabit(name)
     }
 
     data class State(

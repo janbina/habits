@@ -4,6 +4,8 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
+import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
@@ -49,6 +51,12 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         toolbar = view.findViewById(R.id.toolbar)
         viewPager = view.findViewById(R.id.viewPager)
         calendar = view.findViewById(R.id.exSevenCalendar)
+
+        val et = view.findViewById<EditText>(R.id.habitName)
+        view.findViewById<Button>(R.id.saveButton).setOnClickListener {
+            viewModel.createHabit(et.text.toString())
+        }
+
 
         viewPager.adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount() = Int.MAX_VALUE
