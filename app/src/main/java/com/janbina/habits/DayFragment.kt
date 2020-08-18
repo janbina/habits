@@ -1,24 +1,37 @@
 package com.janbina.habits
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.TextView
+import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.observe
+import com.airbnb.epoxy.EpoxyRecyclerView
+import com.github.kittinunf.result.success
+import com.janbina.habits.databinding.FragmentDayBinding
+import com.janbina.habits.databinding.FragmentHomeBinding
+import com.janbina.habits.models.SimpleItem
 import dagger.hilt.android.AndroidEntryPoint
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 @AndroidEntryPoint
-class DayFragment : Fragment(R.layout.fragment_day) {
+class DayFragment : ViewBindingFragment<FragmentDayBinding>(FragmentDayBinding::inflate) {
+
+    private val viewModel: DayViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val daysSinceEpoch = argOr(ARG_DAY, 0)
-
-        view.findViewById<TextView>(R.id.text).text = LocalDate.ofEpochDay(daysSinceEpoch.toLong()).format(
-            DateTimeFormatter.ISO_LOCAL_DATE)
+        viewModel.habitsLv.observe(viewLifecycleOwner) {
+            it.success {
+                binding.recycler.withModels {
+                    it.forEach { habit ->
+                        SimpleItem(habit) { b -> viewModel.markHabitAsCompleted(habit, b)}.id(habit.id).addTo(this)
+                    }
+                }
+            }
+        }
     }
 
     companion object {
@@ -32,10 +45,3 @@ class DayFragment : Fragment(R.layout.fragment_day) {
     }
 }
 
-inline fun <reified T> Fragment.argOr(key: String, default: T): T {
-    val arg = arguments?.get(key)
-    if (arg is T) {
-        return arg
-    }
-    return default
-}
