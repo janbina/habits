@@ -18,10 +18,6 @@ class HomeViewModel @ViewModelInject constructor(
         _state.value = _state.value!!.copy(selectedDate = newDate)
     }
 
-    fun createHabit(name: String) {
-        habitsRepository.createHabit(name)
-    }
-
     data class State(
         val selectedDate: LocalDate = LocalDate.now()
     )
