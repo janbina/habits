@@ -8,13 +8,15 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.janbina.habits.HomeFragment"
-        android:label="Blank"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/toSettingsFragment"
+            app:destination="@id/settingsFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.janbina.habits.settings.SettingsFragment"
-        android:label="Blank"
         tools:layout="@layout/fragment_settings" />
 
 </navigation>

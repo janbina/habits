@@ -4,17 +4,15 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
 import android.widget.TextView
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.janbina.habits.databinding.FragmentHomeBinding
 import com.kizitonwose.calendarview.model.CalendarDay
 import com.kizitonwose.calendarview.ui.DayBinder
 import com.kizitonwose.calendarview.ui.ViewContainer
@@ -25,20 +23,16 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class HomeFragment : Fragment(R.layout.fragment_home) {
+class HomeFragment : ViewBindingFragment<FragmentHomeBinding>(FragmentHomeBinding::inflate) {
 
     @Inject
     lateinit var dateFormatters: DateFormatters
     private val viewModel: HomeViewModel by viewModels()
 
-    private lateinit var toolbar: Toolbar
-    private lateinit var viewPager: ViewPager2
-    private lateinit var calendar: com.kizitonwose.calendarview.CalendarView
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupViews(view)
+        setupViews()
 
         viewModel.state.observe(viewLifecycleOwner, ::onStateChanged)
     }
@@ -47,23 +41,29 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         viewModel.dateChanged(LocalDate.ofEpochDay(date.toLong()))
     }
 
-    private fun setupViews(view: View) {
-        toolbar = view.findViewById(R.id.toolbar)
-        viewPager = view.findViewById(R.id.viewPager)
-        calendar = view.findViewById(R.id.exSevenCalendar)
+    private fun setupViews() {
 
-        val et = view.findViewById<EditText>(R.id.habitName)
-        view.findViewById<Button>(R.id.saveButton).setOnClickListener {
+        binding.toolbar.setOnMenuItemClickListener { item ->
+            if (item.itemId == R.id.menu_item_settings) {
+                findNavController().navigate(HomeFragmentDirections.toSettingsFragment())
+                true
+            } else {
+                false
+            }
+        }
+
+        val et = binding.habitName
+        binding.saveButton.setOnClickListener {
             viewModel.createHabit(et.text.toString())
         }
 
 
-        viewPager.adapter = object : FragmentStateAdapter(this) {
+        binding.viewPager.adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount() = Int.MAX_VALUE
 
             override fun createFragment(position: Int) = DayFragment.create(position)
         }
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 dateSelected(position)
@@ -72,15 +72,15 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         val today = LocalDate.now()
 
-        calendar.dayBinder = object : DayBinder<DayViewContainer> {
+        binding.calendar.dayBinder = object : DayBinder<DayViewContainer> {
             override fun create(view: View) = DayViewContainer(dateFormatters, viewModel, view)
             override fun bind(container: DayViewContainer, day: CalendarDay) = container.bind(day)
         }
 
-        calendar.setup(today.yearMonth.minusMonths(1), today.yearMonth, DayOfWeek.MONDAY)
-        calendar.scrollToDate(today.minusDays(4))
+        binding.calendar.setup(today.yearMonth.minusMonths(1), today.yearMonth, DayOfWeek.MONDAY)
+        binding.calendar.scrollToDate(today.minusDays(4))
 
-        calendar.addOnItemTouchListener(object : RecyclerView.SimpleOnItemTouchListener() {
+        binding.calendar.addOnItemTouchListener(object : RecyclerView.SimpleOnItemTouchListener() {
             override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
                 return rv.scrollState == RecyclerView.SCROLL_STATE_DRAGGING
             }
@@ -88,9 +88,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     private fun onStateChanged(state: HomeViewModel.State) {
-        viewPager.setCurrentItem(state.selectedDate.toEpochDay().toInt(), true)
-        toolbar.title = dateFormatters.formatRelative(state.selectedDate)
-        calendar.notifyCalendarChanged()
+        binding.viewPager.setCurrentItem(state.selectedDate.toEpochDay().toInt(), true)
+        binding.toolbar.title = dateFormatters.formatRelative(state.selectedDate)
+        binding.calendar.notifyCalendarChanged()
     }
 }
 
