@@ -47,19 +47,18 @@ class HomeFragment : ViewBindingFragment<FragmentHomeBinding>(FragmentHomeBindin
     private fun setupViews() {
 
         binding.toolbar.setOnMenuItemClickListener { item ->
-            if (item.itemId == R.id.menu_item_settings) {
-                findNavController().navigate(HomeFragmentDirections.toSettingsFragment())
-                true
-            } else {
-                false
+            when (item.itemId) {
+                R.id.menu_item_settings -> {
+                    findNavController().navigate(HomeFragmentDirections.toSettingsFragment())
+                    true
+                }
+                R.id.menu_item_create -> {
+                    findNavController().navigate(HomeFragmentDirections.toCreateFragment())
+                    true
+                }
+                else -> false
             }
         }
-
-        val et = binding.habitName
-        binding.saveButton.setOnClickListener {
-            viewModel.createHabit(et.text.toString())
-        }
-
 
         binding.viewPager.adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount() = Int.MAX_VALUE

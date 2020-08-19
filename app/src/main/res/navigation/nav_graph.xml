@@ -12,11 +12,19 @@
         <action
             android:id="@+id/toSettingsFragment"
             app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/toCreateFragment"
+            app:destination="@id/createFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.janbina.habits.ui.settings.SettingsFragment"
         tools:layout="@layout/fragment_settings" />
+
+    <fragment
+        android:id="@+id/createFragment"
+        android:name="com.janbina.habits.ui.create.CreateFragment"
+        tools:layout="@layout/fragment_create" />
 
 </navigation>
