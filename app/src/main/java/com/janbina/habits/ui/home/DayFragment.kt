@@ -5,10 +5,14 @@ import android.view.View
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
+import androidx.navigation.fragment.findNavController
 import com.github.kittinunf.result.success
+import com.janbina.habits.R
 import com.janbina.habits.ui.base.ViewBindingFragment
 import com.janbina.habits.databinding.FragmentDayBinding
 import com.janbina.habits.models.SimpleItem
+import com.janbina.habits.ui.detail.HabitDetailFragment
+import com.janbina.habits.ui.detail.HabitDetailFragmentArgs
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -23,7 +27,11 @@ class DayFragment : ViewBindingFragment<FragmentDayBinding>(FragmentDayBinding::
             it.success {
                 binding.recycler.withModels {
                     it.forEach { habit ->
-                        SimpleItem(habit) { b -> viewModel.markHabitAsCompleted(habit, b)}.id(habit.id).addTo(this)
+                        SimpleItem(
+                            habit,
+                            { completed -> viewModel.markHabitAsCompleted(habit, completed)},
+                            { findNavController().navigate(R.id.habitDetailFragment, HabitDetailFragmentArgs(habit.id).toBundle()) }
+                        ).id(habit.id).addTo(this)
                     }
                 }
             }
