@@ -1,4 +1,4 @@
-package com.janbina.habits.repository
+package com.janbina.habits.data.repository
 
 import com.github.kittinunf.result.coroutines.SuspendableResult
 import com.google.firebase.auth.FirebaseAuth

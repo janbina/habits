@@ -1,4 +1,4 @@
-package com.janbina.habits
+package com.janbina.habits.ui.home
 
 import androidx.hilt.Assisted
 import androidx.hilt.lifecycle.ViewModelInject
@@ -7,15 +7,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.janbina.habits.models.HabitDay
-import com.janbina.habits.models.firestore.HabitFirestore
-import com.janbina.habits.repository.HabitsRepository
-import com.janbina.habits.repository.Res
+import com.janbina.habits.data.repository.HabitsRepository
+import com.janbina.habits.data.repository.Res
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @ExperimentalCoroutinesApi
 class DayViewModel @ViewModelInject constructor(

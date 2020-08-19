@@ -1,4 +1,4 @@
-package com.janbina.habits.repository
+package com.janbina.habits.data.repository
 
 import com.github.kittinunf.result.Result
 import com.google.firebase.firestore.*
@@ -8,7 +8,6 @@ import com.janbina.habits.models.HabitDay
 import com.janbina.habits.models.firestore.HabitFirestore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import timber.log.Timber

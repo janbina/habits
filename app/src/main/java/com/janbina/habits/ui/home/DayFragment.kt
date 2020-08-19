@@ -1,17 +1,13 @@
-package com.janbina.habits
+package com.janbina.habits.ui.home
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.os.bundleOf
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
-import com.airbnb.epoxy.EpoxyRecyclerView
 import com.github.kittinunf.result.success
+import com.janbina.habits.ui.base.ViewBindingFragment
 import com.janbina.habits.databinding.FragmentDayBinding
-import com.janbina.habits.databinding.FragmentHomeBinding
 import com.janbina.habits.models.SimpleItem
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -37,7 +33,8 @@ class DayFragment : ViewBindingFragment<FragmentDayBinding>(FragmentDayBinding::
     companion object {
         const val ARG_DAY = "ARG_DAY"
 
-        fun create(daysSinceEpoch: Int) = DayFragment().apply {
+        fun create(daysSinceEpoch: Int) = DayFragment()
+            .apply {
             arguments = bundleOf(
                 ARG_DAY to daysSinceEpoch
             )

@@ -1,4 +1,4 @@
-package com.janbina.habits
+package com.janbina.habits.ui.base
 
 import android.os.Bundle
 import android.view.LayoutInflater

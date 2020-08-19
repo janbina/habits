@@ -1,4 +1,4 @@
-package com.janbina.habits
+package com.janbina.habits.ui
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,6 +10,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
+import com.janbina.habits.BuildConfig
+import com.janbina.habits.R
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -28,7 +30,9 @@ class MainActivity : AppCompatActivity() {
 
     fun signIn() {
         val signInIntent: Intent = googleSignInClient.signInIntent
-        startActivityForResult(signInIntent, RC_SIGN_IN)
+        startActivityForResult(signInIntent,
+            RC_SIGN_IN
+        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -1,10 +1,10 @@
-package com.janbina.habits
+package com.janbina.habits.ui.home
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.janbina.habits.repository.HabitsRepository
+import com.janbina.habits.data.repository.HabitsRepository
 import java.time.LocalDate
 
 class HomeViewModel @ViewModelInject constructor(

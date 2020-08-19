@@ -1,4 +1,4 @@
-package com.janbina.habits
+package com.janbina.habits.helpers
 
 import android.content.res.Resources
 import androidx.fragment.app.Fragment

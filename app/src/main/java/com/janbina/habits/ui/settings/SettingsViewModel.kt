@@ -1,13 +1,11 @@
-package com.janbina.habits.settings
+package com.janbina.habits.ui.settings
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.kittinunf.result.coroutines.success
-import com.janbina.habits.repository.AuthRepository
-import com.janbina.habits.repository.HabitsRepository
+import com.janbina.habits.data.repository.AuthRepository
+import com.janbina.habits.data.repository.HabitsRepository
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class SettingsViewModel @ViewModelInject constructor(
     private val authRepository: AuthRepository,
