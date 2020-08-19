@@ -1,4 +1,4 @@
-package com.janbina.habits
+package com.janbina.habits.helpers
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter

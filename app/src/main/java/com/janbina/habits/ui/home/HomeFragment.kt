@@ -1,4 +1,4 @@
-package com.janbina.habits
+package com.janbina.habits.ui.home
 
 import android.graphics.Color
 import android.os.Bundle
@@ -12,7 +12,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.janbina.habits.*
 import com.janbina.habits.databinding.FragmentHomeBinding
+import com.janbina.habits.helpers.DateFormatters
+import com.janbina.habits.ui.base.ViewBindingFragment
 import com.kizitonwose.calendarview.model.CalendarDay
 import com.kizitonwose.calendarview.ui.DayBinder
 import com.kizitonwose.calendarview.ui.ViewContainer
@@ -73,7 +76,12 @@ class HomeFragment : ViewBindingFragment<FragmentHomeBinding>(FragmentHomeBindin
         val today = LocalDate.now()
 
         binding.calendar.dayBinder = object : DayBinder<DayViewContainer> {
-            override fun create(view: View) = DayViewContainer(dateFormatters, viewModel, view)
+            override fun create(view: View) =
+                DayViewContainer(
+                    dateFormatters,
+                    viewModel,
+                    view
+                )
             override fun bind(container: DayViewContainer, day: CalendarDay) = container.bind(day)
         }
 
@@ -117,7 +125,9 @@ class DayViewContainer(
         dayName.text = dateFormatters.dayNameFormatter.format(day.date)
 
         if (day.date.isEqual(viewModel.state.value?.selectedDate)) {
-            dayNum.setTextColor(ContextCompat.getColor(dayNum.context, R.color.example_3_blue))
+            dayNum.setTextColor(ContextCompat.getColor(dayNum.context,
+                R.color.example_3_blue
+            ))
             dayNum.setBackgroundResource(R.drawable.day_selected)
         } else {
             dayNum.setTextColor(Color.WHITE)

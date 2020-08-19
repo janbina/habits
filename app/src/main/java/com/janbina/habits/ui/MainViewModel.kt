@@ -1,10 +1,10 @@
-package com.janbina.habits
+package com.janbina.habits.ui
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.kittinunf.result.coroutines.success
-import com.janbina.habits.repository.AuthRepository
+import com.janbina.habits.data.repository.AuthRepository
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
