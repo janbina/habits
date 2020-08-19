@@ -3,12 +3,11 @@ package com.janbina.habits.models
 import com.janbina.habits.R
 import com.janbina.habits.databinding.ItemSimpleBinding
 import com.janbina.habits.helpers.ViewBindingKotlinModel
-import com.janbina.habits.models.firestore.HabitFirestore
-import timber.log.Timber
 
 data class SimpleItem(
     val habit: HabitDay,
-    val onCompletedListener: (Boolean) -> Unit
+    val onCompletedListener: (Boolean) -> Unit,
+    val onClickListener: () -> Unit
 ) : ViewBindingKotlinModel<ItemSimpleBinding>(R.layout.item_simple) {
 
     override fun ItemSimpleBinding.bind() {
@@ -16,14 +15,12 @@ data class SimpleItem(
         checkBox.isChecked = habit.completed
 
         checkBox.setOnClickListener {
-            Timber.e("CHECKED CHANGE ${habit.name}, ${checkBox.isChecked}")
             onCompletedListener(checkBox.isChecked)
         }
 
-//        checkBox.setOnCheckedChangeListener { _, checked ->
-//            Timber.e("CHECKED CHANGE ${habit.name}, $checked")
-//            onCompletedListener(checked)
-//        }
+        wrapper.setOnClickListener {
+            onClickListener()
+        }
     }
 
 }
