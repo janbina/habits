@@ -1,24 +1,31 @@
 package com.janbina.habits.ui.home
 
-import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.janbina.habits.data.repository.HabitsRepository
+import com.airbnb.mvrx.MvRxState
+import com.janbina.habits.di.helpers.AssistedViewModelFactory
+import com.janbina.habits.di.helpers.DaggerVmFactory
+import com.janbina.habits.ui.base.BaseViewModel
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import java.time.LocalDate
 
-class HomeViewModel @ViewModelInject constructor(
-    private val habitsRepository: HabitsRepository
-) : ViewModel() {
+data class HomeState(
+    val selectedDate: LocalDate = LocalDate.now()
+) : MvRxState
 
-    private val _state = MutableLiveData(State())
-    val state: LiveData<State> get() = _state
+class HomeViewModel @AssistedInject constructor(
+    @Assisted state: HomeState,
+) : BaseViewModel<HomeState>(state) {
 
-    fun dateChanged(newDate: LocalDate) {
-        _state.value = _state.value!!.copy(selectedDate = newDate)
+    fun dateChanged(newDate: LocalDate) = setState {
+        copy(selectedDate = newDate)
     }
 
-    data class State(
-        val selectedDate: LocalDate = LocalDate.now()
-    )
+    @AssistedInject.Factory
+    interface Factory : AssistedViewModelFactory<HomeViewModel, HomeState> {
+        override fun create(state: HomeState): HomeViewModel
+    }
+
+    companion object :
+        DaggerVmFactory<HomeViewModel, HomeState>(HomeViewModel::class.java)
+
 }

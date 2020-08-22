@@ -1,10 +1,10 @@
 package com.janbina.habits.data.repository
 
 import com.github.kittinunf.result.Result
-import com.google.firebase.firestore.*
-import com.google.firebase.firestore.ktx.getField
-import com.google.firebase.firestore.ktx.toObjects
+import com.github.kittinunf.result.map
+import com.janbina.habits.data.database.FirestoreDb
 import com.janbina.habits.models.HabitDay
+import com.janbina.habits.models.firestore.DayFirestore
 import com.janbina.habits.models.firestore.HabitFirestore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
@@ -16,112 +16,72 @@ import javax.inject.Inject
 typealias Res<T> = Result<T, Exception>
 
 class HabitsRepository @Inject constructor(
-    private val firestore: FirebaseFirestore,
-    private val authRepository: AuthRepository,
+    private val firestoreDb: FirestoreDb,
 ) {
 
-    private val userCollection: DocumentReference
-        get() {
-            return firestore.collection("users").document(authRepository.currentUser().uid)
-        }
-
-    private val usersHabits: CollectionReference
-        get() {
-            return userCollection.collection("habits")
-        }
-
-    private val userDays: CollectionReference
-        get() {
-            return userCollection.collection("days")
-        }
-
-    fun createTask() {
-        usersHabits.add(mapOf("name" to "Fukin cold shower"))
-            .addOnFailureListener { Timber.e("FAIL ${it.message}") }
-            .addOnSuccessListener { Timber.e("SUCCC") }
-        userDays.document("2020-08-18")
-            .update("completed", FieldValue.arrayUnion(System.currentTimeMillis()))
-
-    }
-
     fun createHabit(name: String) {
-        usersHabits.add(mapOf("name" to name))
+        firestoreDb.insertHabit(HabitFirestore(name = name))
     }
 
-    suspend fun setHabitComplete(id: String, day: String, completed: Boolean) {
-//        delay(1000)
-//        Timber.e("SET HABIT COMPLETE $id, $completed, $day")
-        val value = if (completed) {
-            FieldValue.arrayUnion(id)
-        } else {
-            FieldValue.arrayRemove(id)
-        }
-        userDays.document(day)
-            .set(mapOf("day" to day.toInt(), "completed" to value), SetOptions.merge())
+    fun deleteHabit(id: String) {
+        firestoreDb.deleteHabit(id)
     }
 
+    fun setHabitComplete(id: String, day: Int, completed: Boolean) {
+        firestoreDb.changeHabitCompletionForDay(id, day, completed)
+    }
 
     @ExperimentalCoroutinesApi
-    suspend fun getHabitsForDay(day: Int): Flow<Res<List<HabitDay>>> = callbackFlow {
-        var daysResponse: DaysResponse? = null
-        var habits: List<HabitFirestore>? = null
-
-        fun combine() {
-            val dr = daysResponse ?: return
-            val h = habits ?: return
-
-            offer(Res.success(createHabitDays(h, dr)))
-        }
-
-        val sub1 = userDays
-            .whereLessThanOrEqualTo("day", day)
-            .whereGreaterThan("day", day - 14)
-            .orderBy("day")
-            .addSnapshotListener { value, error ->
-                if (error != null) {
-                    offer(Res.error(error))
-                } else if (value == null) {
-                    offer(Res.error(IllegalStateException()))
-                } else {
-                    daysResponse = createDaysResponse(value, day)
-                    combine()
-                }
-            }
-
-        val sub2 = usersHabits.addSnapshotListener { snapshot, error ->
-            when {
-                error != null -> {
-                    offer(Res.error(error))
-                }
-                snapshot == null -> {
-                    offer(Res.error(IllegalStateException()))
-                }
-                else -> {
-                    habits = snapshot.toObjects()
-                    combine()
-                }
+    suspend fun getHabitDetail(id: String): Flow<Res<HabitDetail>> = callbackFlow {
+        val subs = TupleQuery(
+            firestoreDb.getHabit(id),
+            firestoreDb.getDaysWhenHabitCompleted(id)
+        ).addListener { habit, days ->
+            try {
+                offer(Res.success(HabitDetail(habit.get(), days.get())))
+            } catch (e: Exception) {
+                offer(Res.error(e))
             }
         }
 
         awaitClose {
-            sub1.remove()
-            sub2.remove()
+            subs.forEach { it.remove() }
         }
     }
 
-    private fun createDaysResponse(snap: QuerySnapshot, day: Int): DaysResponse {
+    data class HabitDetail(
+        val habit: HabitFirestore,
+        val days: List<Long>
+    )
+
+    @ExperimentalCoroutinesApi
+    suspend fun getHabitsForDay(day: Int): Flow<Res<List<HabitDay>>> = callbackFlow {
+        val subs = TupleQuery(
+            firestoreDb.getDays(day - 14, day),
+            firestoreDb.getAllHabits()
+        ).addListener { days, habits ->
+            try {
+                offer(Res.success(createHabitDays(habits.get(), createDaysResponse(days.get(), day))))
+            } catch (e: Exception) {
+                offer(Res.error(e))
+            }
+        }
+
+        awaitClose {
+            subs.forEach { it.remove() }
+        }
+    }
+
+    private fun createDaysResponse(days: List<DayFirestore>, day: Int): DaysResponse {
         val completed = mutableSetOf<String>()
         val counts = mutableMapOf<String, Int>()
 
-        snap.documents.forEach {
-            val compl = (it.get("completed") as? List<String>) ?: emptyList()
-            val d = it.getField<Int>("day") ?: 0
-
-            if (d == day) {
-                completed.addAll(compl)
+        days.forEach {
+            if (it.day == day) {
+                completed.addAll(it.completed)
             } else {
-                compl.forEach {
-                    counts.merge(it, 14 - day + d) { a, b -> a + b }
+                it.completed.forEach { id ->
+                    counts.merge(id, 14 - day - it.day, Integer::sum)
                 }
             }
         }
