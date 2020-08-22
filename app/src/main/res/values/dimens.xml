@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="habit_detail_day_height">40dp</dimen>
+    <dimen name="habit_detail_calendar_height">240dp</dimen> <!-- 6 * habit_detail_day_height -->
+</resources>
