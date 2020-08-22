@@ -18,6 +18,8 @@ abstract class BaseFragment<T : ViewBinding>(
     private var _binding: T? = null
     protected val binding get() = _binding!!
 
+    protected abstract fun setupView()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -26,6 +28,11 @@ abstract class BaseFragment<T : ViewBinding>(
         return inflate(inflater, container, false)
             .also { _binding = it }
             .root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupView()
     }
 
     override fun onDestroyView() {

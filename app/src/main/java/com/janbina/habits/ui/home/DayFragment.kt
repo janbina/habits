@@ -20,6 +20,8 @@ class DayFragment : BaseFragment<FragmentDayBinding>(FragmentDayBinding::inflate
     private val viewModel: DayViewModel by fragmentViewModel()
     private val args: Args by args()
 
+    override fun setupView() {}
+
     override fun invalidate() = withState(viewModel) {
         it.habits()?.let {
             binding.recycler.withModels {

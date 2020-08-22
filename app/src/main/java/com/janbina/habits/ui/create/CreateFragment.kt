@@ -1,7 +1,5 @@
 package com.janbina.habits.ui.create
 
-import android.os.Bundle
-import android.view.View
 import androidx.navigation.fragment.findNavController
 import com.airbnb.mvrx.fragmentViewModel
 import com.janbina.habits.databinding.FragmentCreateBinding
@@ -13,24 +11,15 @@ class CreateFragment : BaseFragment<FragmentCreateBinding>(FragmentCreateBinding
 
     private val viewModel: CreateViewModel by fragmentViewModel()
 
-    override fun invalidate() {
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        setupViews()
-
-        val et = binding.habitName
-        binding.saveButton.setOnClickListener {
-            viewModel.createHabit(et.text.toString())
-        }
-    }
-
-    private fun setupViews() = binding.apply {
+    override fun setupView() = with(binding) {
         toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
+        saveButton.setOnClickListener {
+            viewModel.createHabit(habitName.text.toString())
+        }
     }
+
+    override fun invalidate() {}
 
 }

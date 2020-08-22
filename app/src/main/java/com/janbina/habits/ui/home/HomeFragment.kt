@@ -1,7 +1,6 @@
 package com.janbina.habits.ui.home
 
 import android.graphics.Color
-import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
@@ -45,17 +44,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         binding.calendar.notifyCalendarChanged()
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        setupViews()
-    }
-
     fun dateSelected(date: Int) {
         viewModel.dateChanged(LocalDate.ofEpochDay(date.toLong()))
     }
 
-    private fun setupViews() {
+    override fun setupView() {
 
         binding.toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
