@@ -6,7 +6,6 @@ import com.janbina.habits.data.database.FirestoreDb
 import com.janbina.habits.models.HabitDay
 import com.janbina.habits.models.firestore.DayFirestore
 import com.janbina.habits.models.firestore.HabitFirestore
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -31,7 +30,6 @@ class HabitsRepository @Inject constructor(
         firestoreDb.changeHabitCompletionForDay(id, day, completed)
     }
 
-    @ExperimentalCoroutinesApi
     suspend fun getHabitDetail(id: String): Flow<Res<HabitDetail>> = callbackFlow {
         val subs = TupleQuery(
             firestoreDb.getHabit(id),
@@ -54,7 +52,6 @@ class HabitsRepository @Inject constructor(
         val days: List<Long>
     )
 
-    @ExperimentalCoroutinesApi
     suspend fun getHabitsForDay(day: Int): Flow<Res<List<HabitDay>>> = callbackFlow {
         val subs = TupleQuery(
             firestoreDb.getDays(day - 14, day),
