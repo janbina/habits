@@ -47,8 +47,6 @@ class HabitDetailFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupView()
-
         binding.calendar.daySize =
             Size.autoWidth(resources.getDimension(R.dimen.habit_detail_day_height).toInt())
         binding.calendar.setMonthPadding(16.px, 0, 16.px, 0)
@@ -95,7 +93,7 @@ class HabitDetailFragment :
         }
     }
 
-    private fun setupView() = binding.apply {
+    override fun setupView() = with(binding) {
         toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
