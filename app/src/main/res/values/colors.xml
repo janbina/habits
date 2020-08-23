@@ -6,4 +6,6 @@
 
     <color name="example_3_blue">#1973E8</color>
     <color name="example_3_blue_light">#D2E3FC</color>
+
+    <color name="deleteRed">#E1224B</color>
 </resources>

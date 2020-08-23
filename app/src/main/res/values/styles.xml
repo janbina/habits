@@ -1,3 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <style name="DeleteAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="materialAlertDialogTitleTextStyle">@style/MaterialAlertDialog.App.Title.Text</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.App.Dialog.DeleteButton</item>
+    </style>
+
+    <style name="MaterialAlertDialog.App.Title.Text" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="Widget.App.Dialog.DeleteButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.DeleteButton</item>
+    </style>
+
+    <style name="ThemeOverlay.App.DeleteButton" parent="">
+        <item name="colorPrimary">@color/deleteRed</item>
+    </style>
 
 </resources>

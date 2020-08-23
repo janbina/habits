@@ -4,10 +4,12 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.airbnb.mvrx.*
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.janbina.habits.R
 import com.janbina.habits.data.repository.HabitsRepository
 import com.janbina.habits.databinding.FragmentHabitDetailBinding
@@ -102,8 +104,7 @@ class HabitDetailFragment :
         toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.menu_item_delete -> {
-                    viewModel.delete()
-                    findNavController().navigateUp()
+                    confirmDeletion()
                     true
                 }
                 R.id.menu_item_edit -> {
@@ -115,6 +116,21 @@ class HabitDetailFragment :
                 else -> false
             }
         }
+    }
+
+    override fun setupRegistrations() {
+        handleNavigationEvents(viewModel)
+    }
+
+    private fun confirmDeletion() {
+        MaterialAlertDialogBuilder(requireContext(), R.style.DeleteAlertDialog)
+            .setTitle("Delete ${withState(viewModel){it.habitDetail()?.habit?.name}}")
+            .setMessage("Are you sure you want to delete this habit? You will lose all the history and it cannot be undone.")
+            .setPositiveButton("Delete") { _, _ ->
+                viewModel.delete()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     @Parcelize

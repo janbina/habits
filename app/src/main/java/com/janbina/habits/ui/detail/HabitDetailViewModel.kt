@@ -8,6 +8,7 @@ import com.janbina.habits.data.repository.HabitsRepository
 import com.janbina.habits.di.helpers.AssistedViewModelFactory
 import com.janbina.habits.di.helpers.DaggerVmFactory
 import com.janbina.habits.ui.base.BaseViewModel
+import com.janbina.habits.ui.viewevent.NavigationEvent
 import com.kizitonwose.calendarview.utils.yearMonth
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
@@ -58,6 +59,7 @@ class HabitDetailViewModel @AssistedInject constructor(
 
     fun delete() {
         habitsRepository.deleteHabit(initialState.id)
+        NavigationEvent.back().publish()
     }
 
     @AssistedInject.Factory
