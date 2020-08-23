@@ -1,9 +1,12 @@
 package com.janbina.habits.ui.create
 
+import androidx.core.widget.doAfterTextChanged
 import androidx.navigation.fragment.findNavController
 import com.airbnb.mvrx.fragmentViewModel
+import com.airbnb.mvrx.withState
 import com.janbina.habits.databinding.FragmentCreateBinding
 import com.janbina.habits.ui.base.BaseFragment
+import com.janbina.habits.util.updateText
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -15,11 +18,12 @@ class CreateFragment : BaseFragment<FragmentCreateBinding>(FragmentCreateBinding
         toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
-        saveButton.setOnClickListener {
-            viewModel.createHabit(habitName.text.toString())
-        }
+        habitName.doAfterTextChanged { viewModel.nameChanged(habitName.text.toString()) }
+        saveButton.setOnClickListener { viewModel.createHabit() }
     }
 
-    override fun invalidate() {}
+    override fun invalidate() = withState(viewModel) {
+        binding.habitName.updateText(it.name)
+    }
 
 }
