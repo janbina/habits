@@ -6,10 +6,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import com.airbnb.mvrx.BaseMvRxFragment
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxView
+import com.janbina.habits.ui.viewevent.NavigationEvent
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 abstract class BaseFragment<T : ViewBinding>(
     private val inflate: (LayoutInflater, ViewGroup?, Boolean) -> T
@@ -18,7 +23,21 @@ abstract class BaseFragment<T : ViewBinding>(
     private var _binding: T? = null
     protected val binding get() = _binding!!
 
-    protected abstract fun setupView()
+    protected open fun setupView() {}
+    protected open fun setupRegistrations() {}
+
+    protected fun handleNavigationEvents(viewModel: BaseViewModel<*>) {
+        viewModel.viewEvents
+            .onEach {
+                if (it != null && it.isConsumed.not()) {
+                    if (it is NavigationEvent) {
+                        it.consume()
+                        it.navigate(findNavController())
+                    }
+                }
+            }
+            .launchIn(lifecycleScope)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,6 +52,7 @@ abstract class BaseFragment<T : ViewBinding>(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupView()
+        setupRegistrations()
     }
 
     override fun onDestroyView() {

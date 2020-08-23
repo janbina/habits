@@ -1,14 +1,19 @@
 package com.janbina.habits.ui.home
 
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.fragment.findNavController
 import com.airbnb.mvrx.*
 import com.github.kittinunf.result.failure
 import com.github.kittinunf.result.success
+import com.janbina.habits.R
 import com.janbina.habits.data.repository.HabitsRepository
 import com.janbina.habits.di.helpers.AssistedViewModelFactory
 import com.janbina.habits.di.helpers.DaggerVmFactory
 import com.janbina.habits.models.HabitDay
 import com.janbina.habits.ui.base.BaseViewModel
+import com.janbina.habits.ui.detail.HabitDetailFragment
+import com.janbina.habits.ui.viewevent.NavigationEvent
+import com.janbina.habits.ui.viewevent.ViewEvent
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.flow.collect
@@ -46,6 +51,12 @@ class DayViewModel @AssistedInject constructor(
 
     fun markHabitAsCompleted(habit: HabitDay, completed: Boolean) {
         habitsRepository.setHabitComplete(habit.id, initialState.day, completed)
+    }
+
+    fun openHabit(habit: HabitDay) {
+        NavigationEvent(R.id.habitDetailFragment, HabitDetailFragment.Args(
+            habit.id, initialState.day
+        )).publish()
     }
 
     @AssistedInject.Factory

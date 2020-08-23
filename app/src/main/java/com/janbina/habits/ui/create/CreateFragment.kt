@@ -24,6 +24,10 @@ class CreateFragment : BaseFragment<FragmentCreateBinding>(FragmentCreateBinding
         saveButton.setOnClickListener { viewModel.save() }
     }
 
+    override fun setupRegistrations() {
+        handleNavigationEvents(viewModel)
+    }
+
     override fun invalidate() = withState(viewModel) {
         binding.habitName.updateText(it.name)
     }

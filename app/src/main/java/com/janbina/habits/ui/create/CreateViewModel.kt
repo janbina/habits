@@ -7,6 +7,7 @@ import com.janbina.habits.data.repository.HabitsRepository
 import com.janbina.habits.di.helpers.AssistedViewModelFactory
 import com.janbina.habits.di.helpers.DaggerVmFactory
 import com.janbina.habits.ui.base.BaseViewModel
+import com.janbina.habits.ui.viewevent.NavigationEvent
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.launch
@@ -34,6 +35,7 @@ class CreateViewModel @AssistedInject constructor(
 
     fun save() = withState {
         habitsRepository.saveHabit(initialState.args.id, it.name)
+        NavigationEvent.back().publish()
     }
 
     private fun loadHabit() {
