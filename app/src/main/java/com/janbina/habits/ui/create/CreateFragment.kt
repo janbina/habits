@@ -6,8 +6,10 @@ import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.withState
 import com.janbina.habits.databinding.FragmentCreateBinding
 import com.janbina.habits.ui.base.BaseFragment
+import com.janbina.habits.ui.base.FragmentArgs
 import com.janbina.habits.util.updateText
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.parcel.Parcelize
 
 @AndroidEntryPoint
 class CreateFragment : BaseFragment<FragmentCreateBinding>(FragmentCreateBinding::inflate) {
@@ -19,11 +21,16 @@ class CreateFragment : BaseFragment<FragmentCreateBinding>(FragmentCreateBinding
             findNavController().navigateUp()
         }
         habitName.doAfterTextChanged { viewModel.nameChanged(habitName.text.toString()) }
-        saveButton.setOnClickListener { viewModel.createHabit() }
+        saveButton.setOnClickListener { viewModel.save() }
     }
 
     override fun invalidate() = withState(viewModel) {
         binding.habitName.updateText(it.name)
     }
+
+    @Parcelize
+    data class Args(
+        val id: String? = null
+    ) : FragmentArgs()
 
 }

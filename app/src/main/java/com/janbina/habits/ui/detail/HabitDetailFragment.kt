@@ -15,6 +15,7 @@ import com.janbina.habits.databinding.ItemCalendarDayDetailBinding
 import com.janbina.habits.helpers.px
 import com.janbina.habits.ui.base.BaseFragment
 import com.janbina.habits.ui.base.FragmentArgs
+import com.janbina.habits.ui.create.CreateFragment
 import com.janbina.habits.util.BindingDayBinder
 import com.kizitonwose.calendarview.model.DayOwner
 import com.kizitonwose.calendarview.utils.Size
@@ -103,6 +104,12 @@ class HabitDetailFragment :
                 R.id.menu_item_delete -> {
                     viewModel.delete()
                     findNavController().navigateUp()
+                    true
+                }
+                R.id.menu_item_edit -> {
+                    withState(viewModel) {
+                        findNavController().navigate(R.id.createFragment, CreateFragment.Args(it.id).toBundle())
+                    }
                     true
                 }
                 else -> false

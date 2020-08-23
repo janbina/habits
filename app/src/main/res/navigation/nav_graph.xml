@@ -35,9 +35,4 @@
         android:name="com.janbina.habits.ui.detail.HabitDetailFragment"
         tools:layout="@layout/fragment_habit_detail" />
 
-    <fragment
-        android:id="@+id/testFragment"
-        android:name="com.janbina.habits.ui.test.TestFragment"
-        tools:layout="@layout/fragment_test" />
-
 </navigation>
