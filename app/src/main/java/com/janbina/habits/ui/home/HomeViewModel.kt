@@ -13,8 +13,8 @@ data class HomeState(
 ) : MvRxState
 
 class HomeViewModel @AssistedInject constructor(
-    @Assisted state: HomeState,
-) : BaseViewModel<HomeState>(state) {
+    @Assisted initialState: HomeState,
+) : BaseViewModel<HomeState>(initialState) {
 
     fun dateChanged(newDate: LocalDate) = setState {
         copy(selectedDate = newDate)
@@ -22,7 +22,7 @@ class HomeViewModel @AssistedInject constructor(
 
     @AssistedInject.Factory
     interface Factory : AssistedViewModelFactory<HomeViewModel, HomeState> {
-        override fun create(state: HomeState): HomeViewModel
+        override fun create(initialState: HomeState): HomeViewModel
     }
 
     companion object :

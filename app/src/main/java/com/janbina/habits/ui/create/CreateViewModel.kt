@@ -13,9 +13,9 @@ data class CreateState(
 ) : MvRxState
 
 class CreateViewModel @AssistedInject constructor(
-    @Assisted state: CreateState,
+    @Assisted initialState: CreateState,
     private val habitsRepository: HabitsRepository
-) : BaseViewModel<CreateState>(state) {
+) : BaseViewModel<CreateState>(initialState) {
 
     fun nameChanged(name: String) = setState {
         copy(name = name)
@@ -27,7 +27,7 @@ class CreateViewModel @AssistedInject constructor(
 
     @AssistedInject.Factory
     interface Factory : AssistedViewModelFactory<CreateViewModel, CreateState> {
-        override fun create(state: CreateState): CreateViewModel
+        override fun create(initialState: CreateState): CreateViewModel
     }
 
     companion object :

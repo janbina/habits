@@ -14,10 +14,10 @@ import kotlinx.coroutines.launch
 data class SettingsState(val x: String = "") : MvRxState
 
 class SettingsViewModel @AssistedInject constructor(
-    @Assisted state: SettingsState,
+    @Assisted initialState: SettingsState,
     private val authRepository: AuthRepository,
     private val habitsRepository: HabitsRepository
-) : BaseViewModel<SettingsState>(state) {
+) : BaseViewModel<SettingsState>(initialState) {
 
 
     fun loginAnonymously() {
@@ -32,7 +32,7 @@ class SettingsViewModel @AssistedInject constructor(
 
     @AssistedInject.Factory
     interface Factory : AssistedViewModelFactory<SettingsViewModel, SettingsState> {
-        override fun create(state: SettingsState): SettingsViewModel
+        override fun create(initialState: SettingsState): SettingsViewModel
     }
 
     companion object :

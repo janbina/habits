@@ -35,9 +35,9 @@ data class HabitDetailState(
 }
 
 class HabitDetailViewModel @AssistedInject constructor(
-    @Assisted state: HabitDetailState,
+    @Assisted initialState: HabitDetailState,
     private val habitsRepository: HabitsRepository,
-) : BaseViewModel<HabitDetailState>(state) {
+) : BaseViewModel<HabitDetailState>(initialState) {
 
     init {
         withState {
@@ -64,7 +64,7 @@ class HabitDetailViewModel @AssistedInject constructor(
 
     @AssistedInject.Factory
     interface Factory : AssistedViewModelFactory<HabitDetailViewModel, HabitDetailState> {
-        override fun create(state: HabitDetailState): HabitDetailViewModel
+        override fun create(initialState: HabitDetailState): HabitDetailViewModel
     }
 
     companion object :
