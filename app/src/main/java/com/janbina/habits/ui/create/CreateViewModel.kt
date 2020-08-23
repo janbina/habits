@@ -8,15 +8,21 @@ import com.janbina.habits.ui.base.BaseViewModel
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 
-data class CreateState(val x: String = "") : MvRxState
+data class CreateState(
+    val name: String = ""
+) : MvRxState
 
 class CreateViewModel @AssistedInject constructor(
     @Assisted state: CreateState,
     private val habitsRepository: HabitsRepository
 ) : BaseViewModel<CreateState>(state) {
 
-    fun createHabit(name: String) {
-        habitsRepository.createHabit(name)
+    fun nameChanged(name: String) = setState {
+        copy(name = name)
+    }
+
+    fun createHabit() = withState {
+        habitsRepository.createHabit(it.name)
     }
 
     @AssistedInject.Factory
