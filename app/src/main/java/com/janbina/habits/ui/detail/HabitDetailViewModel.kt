@@ -35,20 +35,18 @@ data class HabitDetailState(
 }
 
 class HabitDetailViewModel @AssistedInject constructor(
-    @Assisted initialState: HabitDetailState,
+    @Assisted private val initialState: HabitDetailState,
     private val habitsRepository: HabitsRepository,
 ) : BaseViewModel<HabitDetailState>(initialState) {
 
     init {
-        withState {
-            viewModelScope.launch {
-                habitsRepository.getHabitDetail(it.id).collect { detail ->
-                    detail.success {
-                        setState { copy(habitDetail = Success(it)) }
-                    }
-                    detail.failure {
-                        setState { copy(habitDetail = Fail(it)) }
-                    }
+        viewModelScope.launch {
+            habitsRepository.getHabitDetail(initialState.id).collect { detail ->
+                detail.success {
+                    setState { copy(habitDetail = Success(it)) }
+                }
+                detail.failure {
+                    setState { copy(habitDetail = Fail(it)) }
                 }
             }
         }
@@ -59,7 +57,7 @@ class HabitDetailViewModel @AssistedInject constructor(
     }
 
     fun delete() {
-        withState { habitsRepository.deleteHabit(it.id) }
+        habitsRepository.deleteHabit(initialState.id)
     }
 
     @AssistedInject.Factory
