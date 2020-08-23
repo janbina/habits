@@ -1,7 +1,6 @@
 package com.janbina.habits.data.repository
 
 import com.github.kittinunf.result.Result
-import com.github.kittinunf.result.map
 import com.janbina.habits.data.database.FirestoreDb
 import com.janbina.habits.models.HabitDay
 import com.janbina.habits.models.firestore.DayFirestore
@@ -9,7 +8,6 @@ import com.janbina.habits.models.firestore.HabitFirestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import timber.log.Timber
 import javax.inject.Inject
 
 typealias Res<T> = Result<T, Exception>
@@ -18,8 +16,8 @@ class HabitsRepository @Inject constructor(
     private val firestoreDb: FirestoreDb,
 ) {
 
-    fun createHabit(name: String) {
-        firestoreDb.insertHabit(HabitFirestore(name = name))
+    fun saveHabit(id: String?, name: String) {
+        firestoreDb.saveHabit(id, HabitFirestore(name = name))
     }
 
     fun deleteHabit(id: String) {
@@ -28,6 +26,10 @@ class HabitsRepository @Inject constructor(
 
     fun setHabitComplete(id: String, day: Int, completed: Boolean) {
         firestoreDb.changeHabitCompletionForDay(id, day, completed)
+    }
+
+    suspend fun getHabitInfo(id: String): Res<HabitFirestore> {
+        return firestoreDb.getHabit(id).get()
     }
 
     suspend fun getHabitDetail(id: String): Flow<Res<HabitDetail>> = callbackFlow {

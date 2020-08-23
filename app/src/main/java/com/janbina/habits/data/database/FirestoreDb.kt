@@ -4,6 +4,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.firestore.ktx.toObjects
+import com.google.firebase.firestore.util.Util
 import com.janbina.habits.data.repository.AuthRepository
 import com.janbina.habits.models.firestore.DayFirestore
 import com.janbina.habits.models.firestore.HabitFirestore
@@ -25,8 +26,14 @@ class FirestoreDb @Inject constructor(
 
     private fun userDayDocument(day: Int) = userDaysCollection.document(day.toString())
 
-    fun insertHabit(habit: HabitFirestore): Task<DocumentReference> {
-        return userHabitsCollection.add(habit)
+    fun saveHabit(id: String?, habit: HabitFirestore): Task<Void> {
+        val ref = if (id != null) {
+            userHabitsCollection.document(id)
+        } else {
+            userHabitsCollection.document()
+        }
+
+        return ref.set(habit)
     }
 
     fun deleteHabit(id: String): Task<Void> {

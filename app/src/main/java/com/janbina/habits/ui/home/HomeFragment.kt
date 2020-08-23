@@ -5,6 +5,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -18,6 +19,7 @@ import com.janbina.habits.helpers.hide
 import com.janbina.habits.helpers.px
 import com.janbina.habits.helpers.show
 import com.janbina.habits.ui.base.BaseFragment
+import com.janbina.habits.ui.create.CreateFragment
 import com.kizitonwose.calendarview.model.CalendarDay
 import com.kizitonwose.calendarview.ui.DayBinder
 import com.kizitonwose.calendarview.ui.ViewContainer
@@ -57,7 +59,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                     true
                 }
                 R.id.menu_item_create -> {
-                    findNavController().navigate(HomeFragmentDirections.toCreateFragment())
+                    findNavController().navigate(R.id.createFragment, CreateFragment.Args().toBundle())
                     true
                 }
                 else -> false
