@@ -5,21 +5,24 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.navigation.NavDirections
-import androidx.navigation.fragment.findNavController
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.withState
 import com.janbina.habits.R
+import com.janbina.habits.databinding.Example7DayBinding
 import com.janbina.habits.databinding.FragmentHomeBinding
 import com.janbina.habits.helpers.DateFormatters
 import com.janbina.habits.helpers.hide
 import com.janbina.habits.helpers.px
 import com.janbina.habits.helpers.show
 import com.janbina.habits.ui.base.BaseFragment
-import com.janbina.habits.ui.create.CreateFragment
+import com.janbina.habits.util.BindingDayBinder
+import com.janbina.habits.util.disableScroll
+import com.janbina.habits.util.onPageSelected
+import com.janbina.habits.util.setMenuActions
 import com.kizitonwose.calendarview.model.CalendarDay
 import com.kizitonwose.calendarview.ui.DayBinder
 import com.kizitonwose.calendarview.ui.ViewContainer
@@ -28,6 +31,7 @@ import com.kizitonwose.calendarview.utils.yearMonth
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.Month
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -46,104 +50,63 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         binding.calendar.notifyCalendarChanged()
     }
 
-    fun dateSelected(date: Int) {
-        viewModel.dateChanged(LocalDate.ofEpochDay(date.toLong()))
+    override fun setupRegistrations() {
+        handleNavigationEvents(viewModel)
     }
 
-    override fun setupView() {
+    override fun setupView() = with(binding) {
 
-        binding.toolbar.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.menu_item_settings -> {
-                    findNavController().navigate(HomeFragmentDirections.toSettingsFragment())
-                    true
-                }
-                R.id.menu_item_create -> {
-                    findNavController().navigate(R.id.createFragment, CreateFragment.Args().toBundle())
-                    true
-                }
-                else -> false
+        toolbar.setMenuActions(mapOf(
+            R.id.menu_item_settings to viewModel::goToSettings,
+            R.id.menu_item_create to viewModel::goToHabitCreation
+        ))
+
+        viewPager.adapter = ViewPagerAdapter(this@HomeFragment)
+        viewPager.onPageSelected {
+            if (it != 0) {
+                dateSelected(it)
             }
         }
-
-        binding.viewPager.adapter = object : FragmentStateAdapter(this) {
-            override fun getItemCount() = Int.MAX_VALUE
-
-            override fun createFragment(position: Int) =
-                DayFragment.create(DayFragment.Args(position))
-        }
-        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                if (position != 0) {
-                    dateSelected(position)
-                }
-            }
-        })
 
         val today = LocalDate.now()
 
-        binding.calendar.dayBinder = object : DayBinder<DayViewContainer> {
-            override fun create(view: View) =
-                DayViewContainer(
-                    dateFormatters,
-                    viewModel,
-                    view
-                )
+        calendar.dayBinder = BindingDayBinder(Example7DayBinding::bind) { day ->
+            root.setOnClickListener {
+                viewModel.dateChanged(day.date)
+            }
+            dayNum.text = dateFormatters.dayNumFormatter.format(day.date)
+            dayName.text = dateFormatters.dayNameFormatter.format(day.date)
 
-            override fun bind(container: DayViewContainer, day: CalendarDay) = container.bind(day)
+            withState(viewModel) {
+                if (day.date.isEqual(it.selectedDate)) {
+                    dayNum.setTextColor(
+                        ContextCompat.getColor(
+                            dayNum.context,
+                            R.color.example_3_blue
+                        )
+                    )
+                    background.show()
+                } else {
+                    dayNum.setTextColor(Color.WHITE)
+                    background.hide()
+                }
+            }
         }
 
-        binding.calendar.daySize = Size.autoWidth(60.px)
+        calendar.daySize = Size.autoWidth(60.px)
 
-        binding.calendar.setup(today.yearMonth.minusMonths(1), today.yearMonth, DayOfWeek.MONDAY)
-        binding.calendar.scrollToDate(today.minusDays(4))
+        calendar.setup(today.yearMonth.minusMonths(1), today.yearMonth.plusMonths(1), DayOfWeek.MONDAY)
+        calendar.scrollToDate(today.minusDays(4))
 
-        binding.calendar.addOnItemTouchListener(object : RecyclerView.SimpleOnItemTouchListener() {
-            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
-                return rv.scrollState == RecyclerView.SCROLL_STATE_DRAGGING
-            }
-        })
+        calendar.disableScroll()
+    }
+
+    private fun dateSelected(date: Int) {
+        viewModel.dateChanged(LocalDate.ofEpochDay(date.toLong()))
     }
 }
 
-class DayViewContainer(
-    private val dateFormatters: DateFormatters,
-    private val viewModel: HomeViewModel,
-    view: View
-) : ViewContainer(view) {
-
-    lateinit var day: CalendarDay
-
-    val dayNum = view.findViewById<TextView>(R.id.dayNum)
-    val dayName = view.findViewById<TextView>(R.id.dayName)
-    val bg = view.findViewById<View>(R.id.background)
-
-    init {
-        view.setOnClickListener {
-            viewModel.dateChanged(day.date)
-        }
-    }
-
-    fun bind(day: CalendarDay) {
-        this.day = day
-        dayNum.text = dateFormatters.dayNumFormatter.format(day.date)
-        dayName.text = dateFormatters.dayNameFormatter.format(day.date)
-
-        withState(viewModel) {
-            if (day.date.isEqual(it.selectedDate)) {
-                dayNum.setTextColor(
-                    ContextCompat.getColor(
-                        dayNum.context,
-                        R.color.example_3_blue
-                    )
-                )
-                bg.show()
-            } else {
-                dayNum.setTextColor(Color.WHITE)
-                dayNum.background = null
-                bg.hide()
-            }
-        }
-    }
+private class ViewPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+    override fun getItemCount() = Int.MAX_VALUE
+    override fun createFragment(position: Int) = DayFragment.create(DayFragment.Args(position))
 }

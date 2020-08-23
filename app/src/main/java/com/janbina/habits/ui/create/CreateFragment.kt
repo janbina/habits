@@ -1,7 +1,5 @@
 package com.janbina.habits.ui.create
 
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.doOnLayout
 import androidx.core.widget.doAfterTextChanged
 import androidx.navigation.fragment.findNavController
 import com.airbnb.mvrx.fragmentViewModel
