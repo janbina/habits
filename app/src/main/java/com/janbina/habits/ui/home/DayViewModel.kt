@@ -26,30 +26,26 @@ data class DayState(
 }
 
 class DayViewModel @AssistedInject constructor(
-    @Assisted initialState: DayState,
+    @Assisted private val initialState: DayState,
     private val habitsRepository: HabitsRepository,
 ) : BaseViewModel<DayState>(initialState) {
 
     init {
-        withState {
-            viewModelScope.launch {
-                habitsRepository.getHabitsForDay(it.day).collect { habits ->
-                    habits.success {
+        viewModelScope.launch {
+            habitsRepository.getHabitsForDay(initialState.day).collect { habits ->
+                habits.success {
 
-                        setState { copy(habits = Success(it)) }
-                    }
-                    habits.failure {
-                        setState { copy(habits = Fail(it)) }
-                    }
+                    setState { copy(habits = Success(it)) }
+                }
+                habits.failure {
+                    setState { copy(habits = Fail(it)) }
                 }
             }
         }
     }
 
     fun markHabitAsCompleted(habit: HabitDay, completed: Boolean) {
-        withState {
-            habitsRepository.setHabitComplete(habit.id, it.day, completed)
-        }
+        habitsRepository.setHabitComplete(habit.id, initialState.day, completed)
     }
 
     @AssistedInject.Factory
