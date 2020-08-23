@@ -17,6 +17,8 @@ import com.janbina.habits.ui.viewevent.ViewEvent
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 data class DayState(
@@ -36,17 +38,14 @@ class DayViewModel @AssistedInject constructor(
 ) : BaseViewModel<DayState>(initialState) {
 
     init {
-        viewModelScope.launch {
-            habitsRepository.getHabitsForDay(initialState.day).collect { habits ->
-                habits.success {
-
-                    setState { copy(habits = Success(it)) }
-                }
-                habits.failure {
-                    setState { copy(habits = Fail(it)) }
-                }
+        habitsRepository.getHabitsForDay(initialState.day).onEach { habits ->
+            habits.success {
+                setState { copy(habits = Success(it)) }
             }
-        }
+            habits.failure {
+                setState { copy(habits = Fail(it)) }
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun markHabitAsCompleted(habit: HabitDay, completed: Boolean) {

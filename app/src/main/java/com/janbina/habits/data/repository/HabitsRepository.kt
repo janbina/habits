@@ -32,7 +32,7 @@ class HabitsRepository @Inject constructor(
         return firestoreDb.getHabit(id).get()
     }
 
-    suspend fun getHabitDetail(id: String): Flow<Res<HabitDetail>> = callbackFlow {
+    fun getHabitDetail(id: String): Flow<Res<HabitDetail>> = callbackFlow {
         val subs = TupleQuery(
             firestoreDb.getHabit(id),
             firestoreDb.getDaysWhenHabitCompleted(id)
@@ -54,7 +54,7 @@ class HabitsRepository @Inject constructor(
         val days: List<Long>
     )
 
-    suspend fun getHabitsForDay(day: Int): Flow<Res<List<HabitDay>>> = callbackFlow {
+    fun getHabitsForDay(day: Int): Flow<Res<List<HabitDay>>> = callbackFlow {
         val subs = TupleQuery(
             firestoreDb.getDays(day - 14, day),
             firestoreDb.getAllHabits()
