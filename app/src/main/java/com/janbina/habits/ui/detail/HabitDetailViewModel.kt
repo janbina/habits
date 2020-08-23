@@ -8,6 +8,7 @@ import com.janbina.habits.R
 import com.janbina.habits.data.repository.HabitsRepository
 import com.janbina.habits.di.helpers.AssistedViewModelFactory
 import com.janbina.habits.di.helpers.DaggerVmFactory
+import com.janbina.habits.models.HabitDay
 import com.janbina.habits.ui.base.BaseViewModel
 import com.janbina.habits.ui.create.CreateFragment
 import com.janbina.habits.ui.viewevent.NavigationEvent
@@ -55,6 +56,12 @@ class HabitDetailViewModel @AssistedInject constructor(
 
     fun monthSelected(yearMonth: YearMonth) {
         setState { copy(selectedMonth = yearMonth) }
+    }
+
+    fun toggleHabitCompletion(day: LocalDate) = withState {
+        val habit = it.habitDetail() ?: return@withState
+        val epochDay = day.toEpochDay().toInt()
+        habitsRepository.setHabitComplete(it.id, epochDay, habit.days.contains(epochDay.toLong()).not())
     }
 
     fun delete() {

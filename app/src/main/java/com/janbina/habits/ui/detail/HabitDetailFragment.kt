@@ -68,7 +68,10 @@ class HabitDetailFragment :
             val epochDay = day.date.toEpochDay()
             dayText.text = day.date.dayOfMonth.toString()
 
-            dayText.setOnClickListener {}
+            dayText.setOnLongClickListener {
+                viewModel.toggleHabitCompletion(day.date)
+                true
+            }
 
             if (day.owner == DayOwner.THIS_MONTH) {
                 this.dayText.setTextColor(Color.BLACK)
