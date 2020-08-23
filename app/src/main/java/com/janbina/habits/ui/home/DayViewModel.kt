@@ -26,9 +26,9 @@ data class DayState(
 }
 
 class DayViewModel @AssistedInject constructor(
-    @Assisted state: DayState,
+    @Assisted initialState: DayState,
     private val habitsRepository: HabitsRepository,
-) : BaseViewModel<DayState>(state) {
+) : BaseViewModel<DayState>(initialState) {
 
     init {
         withState {
@@ -54,7 +54,7 @@ class DayViewModel @AssistedInject constructor(
 
     @AssistedInject.Factory
     interface Factory : AssistedViewModelFactory<DayViewModel, DayState> {
-        override fun create(state: DayState): DayViewModel
+        override fun create(initialState: DayState): DayViewModel
     }
 
     companion object :
