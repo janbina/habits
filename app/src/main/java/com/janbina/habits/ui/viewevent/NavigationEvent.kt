@@ -19,7 +19,7 @@ abstract class NavigationEvent: ViewEvent() {
             override fun getActionId() = actionId
             override fun getArguments() = args.toBundle()
         })
-        fun back() = UpNavigationEvent
+        fun back() = UpNavigationEvent()
     }
 }
 
@@ -29,7 +29,7 @@ class NavDirectionsNavigationEvent(private val directions: NavDirections) : Navi
     }
 }
 
-object UpNavigationEvent : NavigationEvent() {
+class UpNavigationEvent : NavigationEvent() {
     override fun navigate(navController: NavController) {
         navController.navigateUp()
     }

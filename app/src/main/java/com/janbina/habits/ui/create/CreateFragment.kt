@@ -1,5 +1,7 @@
 package com.janbina.habits.ui.create
 
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnLayout
 import androidx.core.widget.doAfterTextChanged
 import androidx.navigation.fragment.findNavController
 import com.airbnb.mvrx.fragmentViewModel
@@ -7,7 +9,7 @@ import com.airbnb.mvrx.withState
 import com.janbina.habits.databinding.FragmentCreateBinding
 import com.janbina.habits.ui.base.BaseFragment
 import com.janbina.habits.ui.base.FragmentArgs
-import com.janbina.habits.util.updateText
+import com.janbina.habits.util.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.parcel.Parcelize
 
@@ -22,6 +24,8 @@ class CreateFragment : BaseFragment<FragmentCreateBinding>(FragmentCreateBinding
         }
         habitName.doAfterTextChanged { viewModel.nameChanged(habitName.text.toString()) }
         saveButton.setOnClickListener { viewModel.save() }
+
+        habitName.showImeDelayed()
     }
 
     override fun setupRegistrations() {
@@ -32,9 +36,13 @@ class CreateFragment : BaseFragment<FragmentCreateBinding>(FragmentCreateBinding
         binding.habitName.updateText(it.name)
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        hideIme()
+    }
+
     @Parcelize
     data class Args(
         val id: String? = null
     ) : FragmentArgs()
-
 }
