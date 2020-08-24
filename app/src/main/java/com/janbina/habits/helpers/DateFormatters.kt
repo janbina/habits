@@ -5,19 +5,22 @@ import java.time.Year
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class DateFormatters @Inject constructor() {
 
-    val dayNumFormatter = DateTimeFormatter.ofPattern("dd")
-    val dayNameFormatter = DateTimeFormatter.ofPattern("EEE")
-    val fullDateFormatter = DateTimeFormatter.ofPattern("EEE, MMMM dd")
-    val fullDateFormatter2 = DateTimeFormatter.ofPattern("EEE, MMMM dd yyyy")
+    private val locale = Locale.US
 
-    val monthNameFormatter = DateTimeFormatter.ofPattern("MMMM")
-    val monthNameYearFormatter = DateTimeFormatter.ofPattern("MMMM yyyy")
+    val dayNumFormatter = DateTimeFormatter.ofPattern("dd").withLocale(locale)
+    val dayNameFormatter = DateTimeFormatter.ofPattern("EEE").withLocale(locale)
+    val fullDateFormatter = DateTimeFormatter.ofPattern("EEE, MMMM dd").withLocale(locale)
+    val fullDateFormatter2 = DateTimeFormatter.ofPattern("EEE, MMMM dd yyyy").withLocale(locale)
+
+    val monthNameFormatter = DateTimeFormatter.ofPattern("MMMM").withLocale(locale)
+    val monthNameYearFormatter = DateTimeFormatter.ofPattern("MMMM yyyy").withLocale(locale)
 
     fun formatRelative(date: LocalDate): String {
         val now = LocalDate.now()
