@@ -74,7 +74,10 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
-        freeCompilerArgs += "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi"
+        freeCompilerArgs += [
+                "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
+                "-Xuse-experimental=com.chibatching.kotpref.preference.dsl.ExperimentalPreferenceScreenDsl",
+        ]
     }
 }
 
@@ -130,4 +133,10 @@ dependencies {
 
     implementation "com.squareup.inject:assisted-inject-annotations-dagger2:0.5.2"
     kapt "com.squareup.inject:assisted-inject-processor-dagger2:0.5.2"
+
+    implementation 'com.chibatching.kotpref:kotpref:2.11.0'
+    implementation 'com.chibatching.kotpref:livedata-support:2.11.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata:2.2.0'
+    implementation 'com.chibatching.kotpref:preference-screen-dsl:2.11.0'
+    implementation "androidx.preference:preference-ktx:1.1.1"
 }
