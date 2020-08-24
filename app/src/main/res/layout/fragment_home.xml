@@ -14,15 +14,11 @@
             android:layout_height="?attr/actionBarSize"
             app:menu="@menu/menu_home" />
 
-        <com.kizitonwose.calendarview.CalendarView
-            android:id="@+id/calendar"
+        <LinearLayout
+            android:id="@+id/daysLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cv_dayViewResource="@layout/example_7_day"
-            app:cv_inDateStyle="none"
-            app:cv_maxRowCount="1"
-            app:cv_orientation="horizontal"
-            app:cv_outDateStyle="none" />
+            android:orientation="horizontal" />
 
     </com.google.android.material.appbar.AppBarLayout>
 

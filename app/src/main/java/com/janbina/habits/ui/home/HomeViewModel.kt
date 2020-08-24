@@ -12,7 +12,8 @@ import com.squareup.inject.assisted.AssistedInject
 import java.time.LocalDate
 
 data class HomeState(
-    val selectedDate: LocalDate = LocalDate.now()
+    val selectedDate: LocalDate = LocalDate.now(),
+    val daysShown: List<LocalDate> = (-4L..2L).map { selectedDate.plusDays(it) }
 ) : MvRxState
 
 class HomeViewModel @AssistedInject constructor(
