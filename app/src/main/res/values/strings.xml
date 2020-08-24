@@ -6,4 +6,10 @@
     <string name="pref_first_day_sunday">Sunday</string>
     <string name="pref_first_day_monday">Monday</string>
     <string name="pref_first_day_system">System default</string>
+
+    <string name="pref_theme_title">Theme</string>
+    <string name="pref_theme_light">Light</string>
+    <string name="pref_theme_dark">Dark</string>
+    <string name="pref_theme_system">Use system default</string>
+    <string name="pref_theme_battery">Set by Battery Saver</string>
 </resources>
