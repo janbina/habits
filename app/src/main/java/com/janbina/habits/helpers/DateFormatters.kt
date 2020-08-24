@@ -1,7 +1,8 @@
 package com.janbina.habits.helpers
 
+import android.content.res.Resources
+import com.janbina.habits.R
 import java.time.LocalDate
-import java.time.Year
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -10,31 +11,34 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class DateFormatters @Inject constructor() {
+class DateFormatters @Inject constructor(
+    private val resources: Resources
+) {
 
     private val locale = Locale.US
 
-    val dayNumFormatter = DateTimeFormatter.ofPattern("dd").withLocale(locale)
-    val dayNameFormatter = DateTimeFormatter.ofPattern("EEE").withLocale(locale)
-    val fullDateFormatter = DateTimeFormatter.ofPattern("EEE, MMMM dd").withLocale(locale)
-    val fullDateFormatter2 = DateTimeFormatter.ofPattern("EEE, MMMM dd yyyy").withLocale(locale)
+    val dayNumFormatter: DateTimeFormatter = patternFormatter("dd")
+    val shortDayNameFormatter: DateTimeFormatter = patternFormatter("EEE")
 
-    val monthNameFormatter = DateTimeFormatter.ofPattern("MMMM").withLocale(locale)
-    val monthNameYearFormatter = DateTimeFormatter.ofPattern("MMMM yyyy").withLocale(locale)
+    private val namedDateFormatter = patternFormatter("EEE, MMMM dd")
+    private val namedDateAndYearFormatter = patternFormatter("EEE, MMMM dd yyyy")
 
     fun formatRelative(date: LocalDate): String {
         val now = LocalDate.now()
         val dayDiff = ChronoUnit.DAYS.between(date, now)
 
         return when {
-            dayDiff == 0L -> "Today"
-            dayDiff == 1L -> "Yesterday"
-            dayDiff == -1L -> "Tomorrow"
-            dayDiff in 2L..5L -> "$dayDiff days ago"
-            date.year == now.year -> date.format(fullDateFormatter)
-            else -> date.format(fullDateFormatter2)
+            dayDiff == 0L -> resources.getString(R.string.today)
+            dayDiff == 1L -> resources.getString(R.string.yesterday)
+            dayDiff == -1L -> resources.getString(R.string.tomorrow)
+            dayDiff in 2L..5L -> resources.getString(R.string.days_ago, dayDiff)
+            date.year == now.year -> date.format(namedDateFormatter)
+            else -> date.format(namedDateAndYearFormatter)
         }
     }
+
+    private val monthNameFormatter = patternFormatter("MMMM")
+    private val monthNameYearFormatter = patternFormatter("MMMM yyyy")
 
     fun formatMonthNameOptionalYear(date: YearMonth): String {
         return if (date.year == LocalDate.now().year) {
@@ -43,5 +47,7 @@ class DateFormatters @Inject constructor() {
             monthNameYearFormatter.format(date)
         }
     }
+
+    private fun patternFormatter(pattern: String) = DateTimeFormatter.ofPattern(pattern, locale)
 
 }

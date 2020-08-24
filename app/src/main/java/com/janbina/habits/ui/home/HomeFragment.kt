@@ -66,7 +66,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             val b = Example7DayBinding.bind(view)
             val day = state.daysShown[index]
             b.dayNum.text = dateFormatters.dayNumFormatter.format(day)
-            b.dayName.text = dateFormatters.dayNameFormatter.format(day)
+            b.dayName.text = dateFormatters.shortDayNameFormatter.format(day)
 
             if (day == state.selectedDate) {
                 b.dayNum.setTextColor(

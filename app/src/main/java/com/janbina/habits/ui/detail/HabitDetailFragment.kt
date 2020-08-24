@@ -47,7 +47,7 @@ class HabitDetailFragment :
         binding.legendLayout.children.filterIsInstance(TextView::class.java)
             .forEachIndexed { index, view ->
                 view.text =
-                    it.days.getOrNull(index)?.let { dateFormatters.dayNameFormatter.format(it) }
+                    it.days.getOrNull(index)?.let { dateFormatters.shortDayNameFormatter.format(it) }
                         ?: ""
             }
 
@@ -73,7 +73,7 @@ class HabitDetailFragment :
 
         calendar.dayBinder = BindingDayBinder(ItemCalendarDayDetailBinding::bind) { day ->
             val epochDay = day.date.toEpochDay()
-            dayText.text = day.date.dayOfMonth.toString()
+            dayText.text = dateFormatters.dayNumFormatter.format(day.date)
 
             dayText.setOnLongClickListener {
                 viewModel.toggleHabitCompletion(day.date)

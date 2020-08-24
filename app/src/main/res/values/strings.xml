@@ -12,4 +12,9 @@
     <string name="pref_theme_dark">Dark</string>
     <string name="pref_theme_system">Use system default</string>
     <string name="pref_theme_battery">Set by Battery Saver</string>
+
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="days_ago">%1$d days ago</string>
 </resources>
