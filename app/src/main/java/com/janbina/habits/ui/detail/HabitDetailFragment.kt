@@ -3,6 +3,7 @@ package com.janbina.habits.ui.detail
 import android.graphics.Color
 import android.view.View
 import android.widget.TextView
+import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
 import com.airbnb.mvrx.*
@@ -10,6 +11,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.janbina.habits.R
 import com.janbina.habits.databinding.FragmentHabitDetailBinding
 import com.janbina.habits.databinding.ItemCalendarDayDetailBinding
+import com.janbina.habits.helpers.DateFormatters
 import com.janbina.habits.helpers.px
 import com.janbina.habits.ui.base.BaseFragment
 import com.janbina.habits.ui.base.FragmentArgs
@@ -19,28 +21,39 @@ import com.kizitonwose.calendarview.model.DayOwner
 import com.kizitonwose.calendarview.utils.Size
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.parcel.Parcelize
-import timber.log.Timber
-import java.time.DayOfWeek
-import java.time.Month
-import java.time.YearMonth
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class HabitDetailFragment :
     BaseFragment<FragmentHabitDetailBinding>(FragmentHabitDetailBinding::inflate) {
 
     private val viewModel: HabitDetailViewModel by fragmentViewModel()
+    @Inject
+    lateinit var dateFormatters: DateFormatters
 
     override fun invalidate() = withState(viewModel) {
-        binding.calendar.scrollToMonth(it.selectedMonth)
-        binding.calendarMonth.text = it.selectedMonth.month.toString()
+        binding.calendarMonth.text = dateFormatters.formatMonthNameOptionalYear(it.selectedMonth)
         when (it.habitDetail) {
             is Incomplete -> Unit
             is Success -> {
                 binding.name.text = it.habitDetail()?.habit?.name
-                binding.calendar.notifyCalendarChanged()
+                binding.calendar.layoutManager?.let {
+                    binding.calendar.notifyCalendarChanged()
+                }
             }
             is Fail -> Unit
         }
+
+        binding.legendLayout.children.filterIsInstance(TextView::class.java)
+            .forEachIndexed { index, view ->
+                view.text =
+                    it.days.getOrNull(index)?.let { dateFormatters.dayNameFormatter.format(it) }
+                        ?: ""
+            }
+
+        binding.calendar.setup(it.startMonth, it.endMonth, it.days.first())
+        binding.calendar.scrollToMonth(it.selectedMonth)
+        binding.calendar.monthScrollListener = viewModel::monthSelected
     }
 
     override fun setupView() = with(binding) {
@@ -55,14 +68,8 @@ class HabitDetailFragment :
             )
         )
 
-        calendar.daySize = Size.autoWidth(
-            resources.getDimension(R.dimen.habit_detail_day_height).toInt()
-        )
+        calendar.daySize = Size.autoWidth(resources.getDimension(R.dimen.habit_detail_day_height).toInt())
         binding.calendar.setMonthPadding(16.px, 0, 16.px, 0)
-
-        val startMonth = YearMonth.of(1970, Month.JANUARY)
-        val endMonth = YearMonth.of(2200, Month.DECEMBER)
-        calendar.setup(startMonth, endMonth, DayOfWeek.SUNDAY)
 
         calendar.dayBinder = BindingDayBinder(ItemCalendarDayDetailBinding::bind) { day ->
             val epochDay = day.date.toEpochDay()
@@ -88,22 +95,13 @@ class HabitDetailFragment :
             }
         }
 
-        binding.calendar.monthScrollListener = {
-            viewModel.monthSelected(it.yearMonth)
+        repeat(7) {
+            View.inflate(requireContext(), R.layout.item_weekday_day_detail, legendLayout)
         }
-
-        populateLegend()
     }
 
     override fun setupRegistrations() {
         handleNavigationEvents(viewModel)
-    }
-
-    private fun populateLegend() {
-        listOf("SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT").forEachIndexed { index, name ->
-            View.inflate(requireContext(), R.layout.item_weekday_day_detail, binding.legendLayout)
-            (binding.legendLayout.getChildAt(index) as TextView).text = name
-        }
     }
 
     private fun confirmDeletion() {
