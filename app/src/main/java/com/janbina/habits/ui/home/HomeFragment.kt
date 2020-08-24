@@ -1,14 +1,11 @@
 package com.janbina.habits.ui.home
 
 import android.graphics.Color
-import android.view.MotionEvent
 import android.view.View
-import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.children
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import androidx.viewpager2.widget.ViewPager2
 import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.withState
 import com.janbina.habits.R
@@ -16,22 +13,12 @@ import com.janbina.habits.databinding.Example7DayBinding
 import com.janbina.habits.databinding.FragmentHomeBinding
 import com.janbina.habits.helpers.DateFormatters
 import com.janbina.habits.helpers.hide
-import com.janbina.habits.helpers.px
 import com.janbina.habits.helpers.show
 import com.janbina.habits.ui.base.BaseFragment
-import com.janbina.habits.util.BindingDayBinder
-import com.janbina.habits.util.disableScroll
 import com.janbina.habits.util.onPageSelected
 import com.janbina.habits.util.setMenuActions
-import com.kizitonwose.calendarview.model.CalendarDay
-import com.kizitonwose.calendarview.ui.DayBinder
-import com.kizitonwose.calendarview.ui.ViewContainer
-import com.kizitonwose.calendarview.utils.Size
-import com.kizitonwose.calendarview.utils.yearMonth
 import dagger.hilt.android.AndroidEntryPoint
-import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.Month
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -47,7 +34,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             binding.viewPager.currentItem != 0
         )
         binding.toolbar.title = dateFormatters.formatRelative(it.selectedDate)
-        binding.calendar.notifyCalendarChanged()
+        updateDayStrip(it)
     }
 
     override fun setupRegistrations() {
@@ -55,11 +42,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     }
 
     override fun setupView() = with(binding) {
-
-        toolbar.setMenuActions(mapOf(
-            R.id.menu_item_settings to viewModel::goToSettings,
-            R.id.menu_item_create to viewModel::goToHabitCreation
-        ))
+        toolbar.setMenuActions(
+            mapOf(
+                R.id.menu_item_settings to viewModel::goToSettings,
+                R.id.menu_item_create to viewModel::goToHabitCreation
+            )
+        )
 
         viewPager.adapter = ViewPagerAdapter(this@HomeFragment)
         viewPager.onPageSelected {
@@ -68,37 +56,35 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             }
         }
 
-        val today = LocalDate.now()
+        repeat(7) {
+            View.inflate(requireContext(), R.layout.example_7_day, daysLayout)
+        }
+    }
 
-        calendar.dayBinder = BindingDayBinder(Example7DayBinding::bind) { day ->
-            root.setOnClickListener {
-                viewModel.dateChanged(day.date)
-            }
-            dayNum.text = dateFormatters.dayNumFormatter.format(day.date)
-            dayName.text = dateFormatters.dayNameFormatter.format(day.date)
+    private fun updateDayStrip(state: HomeState) {
+        binding.daysLayout.children.forEachIndexed { index, view ->
+            val b = Example7DayBinding.bind(view)
+            val day = state.daysShown[index]
+            b.dayNum.text = dateFormatters.dayNumFormatter.format(day)
+            b.dayName.text = dateFormatters.dayNameFormatter.format(day)
 
-            withState(viewModel) {
-                if (day.date.isEqual(it.selectedDate)) {
-                    dayNum.setTextColor(
-                        ContextCompat.getColor(
-                            dayNum.context,
-                            R.color.example_3_blue
-                        )
+            if (day == state.selectedDate) {
+                b.dayNum.setTextColor(
+                    ContextCompat.getColor(
+                        b.dayNum.context,
+                        R.color.example_3_blue
                     )
-                    background.show()
-                } else {
-                    dayNum.setTextColor(Color.WHITE)
-                    background.hide()
-                }
+                )
+                b.background.show()
+            } else {
+                b.dayNum.setTextColor(Color.WHITE)
+                b.background.hide()
+            }
+
+            b.root.setOnClickListener {
+                viewModel.dateChanged(day)
             }
         }
-
-        calendar.daySize = Size.autoWidth(60.px)
-
-        calendar.setup(today.yearMonth.minusMonths(1), today.yearMonth.plusMonths(1), DayOfWeek.MONDAY)
-        calendar.scrollToDate(today.minusDays(4))
-
-        calendar.disableScroll()
     }
 
     private fun dateSelected(date: Int) {
