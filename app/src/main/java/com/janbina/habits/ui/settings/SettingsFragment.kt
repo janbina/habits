@@ -20,33 +20,21 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         kotprefScreen(preferences) {
             list2(it::firstDayOfWeek, getString(R.string.pref_first_day_title)) {
-                summary = getString(
-                    Preferences.FirstDayOfWeek
-                        .find(it.firstDayOfWeek)
-                        .displayName
-                )
                 entries = Preferences.FirstDayOfWeek.values()
-                        .map { getString(it.displayName) }
-                        .toTypedArray()
+                    .map { getString(it.displayName) }
+                    .toTypedArray()
                 entryValues = Preferences.FirstDayOfWeek.values()
-                        .map { it.value }
-                        .toTypedArray()
+                    .map { it.value }
+                    .toTypedArray()
             }
 
             list2(it::theme, getString(R.string.pref_theme_title)) {
-                summary = getString(
-                    Preferences.Theme
-                        .find(it.theme)
-                        .displayName
-                )
-                entries =
-                    Preferences.Theme.values()
-                        .map { getString(it.displayName) }
-                        .toTypedArray()
-                entryValues =
-                    Preferences.Theme.values()
-                        .map { it.value }
-                        .toTypedArray()
+                entries = Preferences.Theme.values()
+                    .map { getString(it.displayName) }
+                    .toTypedArray()
+                entryValues = Preferences.Theme.values()
+                    .map { it.value }
+                    .toTypedArray()
             }
         }
     }
