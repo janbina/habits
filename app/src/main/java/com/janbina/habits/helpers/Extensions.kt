@@ -2,8 +2,12 @@ package com.janbina.habits.helpers
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.content.Context
 import android.content.res.Resources
 import android.view.View
+import android.widget.TextView
+import androidx.annotation.ColorRes
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 
 inline fun <reified T> Fragment.argOr(key: String, default: T): T {
@@ -46,3 +50,7 @@ fun View.hide() {
 fun View.showOrHide(showCondition: Boolean) {
     if (showCondition) show() else hide()
 }
+
+fun Context.colorCompat(@ColorRes id: Int) = ContextCompat.getColor(this, id)
+
+fun TextView.setTextColorRes(@ColorRes id: Int) = setTextColor(context.colorCompat(id))

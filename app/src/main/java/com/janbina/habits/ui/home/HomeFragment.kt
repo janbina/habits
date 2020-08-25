@@ -11,9 +11,7 @@ import com.airbnb.mvrx.withState
 import com.janbina.habits.R
 import com.janbina.habits.databinding.Example7DayBinding
 import com.janbina.habits.databinding.FragmentHomeBinding
-import com.janbina.habits.helpers.DateFormatters
-import com.janbina.habits.helpers.hide
-import com.janbina.habits.helpers.show
+import com.janbina.habits.helpers.*
 import com.janbina.habits.ui.base.BaseFragment
 import com.janbina.habits.util.onPageSelected
 import com.janbina.habits.util.setMenuActions
@@ -68,18 +66,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             b.dayNum.text = dateFormatters.dayNumFormatter.format(day)
             b.dayName.text = dateFormatters.shortDayNameFormatter.format(day)
 
-            if (day == state.selectedDate) {
-                b.dayNum.setTextColor(
-                    ContextCompat.getColor(
-                        b.dayNum.context,
-                        R.color.example_3_blue
-                    )
-                )
-                b.background.show()
-            } else {
-                b.dayNum.setTextColor(Color.WHITE)
-                b.background.hide()
-            }
+            b.root.isSelected = day == state.selectedDate
+
+//            if (day == state.selectedDate) {
+//                b.dayNum.setTextColorRes(R.color.example_3_blue)
+//                b.background.show()
+//            } else {
+//                b.dayNum.setTextColor(Color.WHITE)
+//                b.background.hide()
+//            }
 
             b.root.setOnClickListener {
                 viewModel.dateChanged(day)
