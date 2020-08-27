@@ -1,0 +1,50 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      ORG_GRADLE_PROJECT_HABITS_RELEASE_KEYSTORE_PWD: ${{ secrets.HABITS_RELEASE_KEYSTORE_PWD }}
+      ORG_GRADLE_PROJECT_HABITS_RELEASE_KEY_PWD: ${{ secrets.HABITS_RELEASE_KEY_PWD }}
+      ORG_GRADLE_PROJECT_HABITS_SERVER_CLIENT_ID: ${{ secrets.HABITS_SERVER_CLIENT_ID }}
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+
+      - name: Decrypt secrets
+        run: ./release/decrypt-secrets.sh
+        env:
+          ENCRYPT_KEY: ${{ secrets.ENCRYPT_KEY }}
+
+      - name: Copy CI gradle.properties
+        run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
+
+      - name: Build and check
+        run: ./gradlew assembleRelease bundleRelease
+
+      - name: Publish to Play Store
+        run: ./gradlew publishRelease
+
+      - name: Clean secrets
+        if: always()
+        run: ./release/clean-secrets.sh
+
+      - name: Upload build outputs
+        if: always()
+        uses: actions/upload-artifact@v1
+        with:
+          name: build-outputs
+          path: app/build/outputs
