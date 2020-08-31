@@ -17,6 +17,7 @@ import com.janbina.habits.ui.base.BaseFragment
 import com.janbina.habits.ui.base.FragmentArgs
 import com.janbina.habits.util.BindingDayBinder
 import com.janbina.habits.util.setMenuActions
+import com.kizitonwose.calendarview.CalendarView
 import com.kizitonwose.calendarview.model.DayOwner
 import com.kizitonwose.calendarview.utils.Size
 import dagger.hilt.android.AndroidEntryPoint
@@ -68,7 +69,7 @@ class HabitDetailFragment :
             )
         )
 
-        calendar.daySize = Size.autoWidth(resources.getDimension(R.dimen.habit_detail_day_height).toInt())
+        calendar.daySize = CalendarView.sizeAutoWidth(resources.getDimension(R.dimen.habit_detail_day_height).toInt())
         binding.calendar.setMonthPadding(16.px, 0, 16.px, 0)
 
         calendar.dayBinder = BindingDayBinder(ItemCalendarDayDetailBinding::bind) { day ->
@@ -101,7 +102,7 @@ class HabitDetailFragment :
     }
 
     override fun setupRegistrations() {
-        handleNavigationEvents(viewModel)
+        viewModel.handleNavigationEvents()
     }
 
     private fun confirmDeletion() {

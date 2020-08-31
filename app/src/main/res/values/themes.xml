@@ -9,6 +9,9 @@
         <!-- Default widget styles -->
         <item name="toolbarStyle">@style/Widget.Habits.Toolbar</item>
         <item name="appBarLayoutStyle">@style/Widget.MaterialComponents.AppBarLayout.Surface</item>
+
+        <!-- Preferences -->
+        <item name="preferenceTheme">@style/Habits.PreferenceThemeOverlay</item>
     </style>
 
     <style name="Theme.Habits" parent="Base.Theme.Habits">
@@ -23,11 +26,9 @@
         <item name="titleTextAppearance">?attr/textAppearanceHeadline6</item>
         <item name="subtitleTextAppearance">?attr/textAppearanceSubtitle2</item>
     </style>
-<!--        <item name="preferenceTheme">@style/YourTheme.PreferenceThemeOverlay</item>-->
-<!--    <style name="YourTheme.PreferenceThemeOverlay" parent="@style/PreferenceThemeOverlay">-->
-<!--        <item name="android:layout">@layout/fragment_settings</item>-->
-<!--    </style>-->
 
-
+    <style name="Habits.PreferenceThemeOverlay" parent="PreferenceThemeOverlay">
+        <item name="android:layout">@layout/fragment_settings</item>
+    </style>
 
 </resources>

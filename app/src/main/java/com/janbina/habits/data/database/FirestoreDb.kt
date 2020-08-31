@@ -17,7 +17,7 @@ class FirestoreDb @Inject constructor(
     private val authRepository: AuthRepository,
 ) {
 
-    private val userId = authRepository.currentUser().uid
+    private val userId get() = authRepository.getUser()?.uid ?: "dummy"
 
     private val userDocument get() = firestore.collection(PATH_USERS).document(userId)
     private val userHabitsCollection get() = userDocument.collection(PATH_HABITS)

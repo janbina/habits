@@ -27,7 +27,7 @@ class CreateFragment : BaseFragment<FragmentCreateBinding>(FragmentCreateBinding
     }
 
     override fun setupRegistrations() {
-        handleNavigationEvents(viewModel)
+        viewModel.handleNavigationEvents()
     }
 
     override fun invalidate() = withState(viewModel) {
