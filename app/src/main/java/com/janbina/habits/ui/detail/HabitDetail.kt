@@ -1,6 +1,5 @@
 package com.janbina.habits.ui.detail
 
-import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -28,10 +27,7 @@ import com.airbnb.mvrx.Success
 import com.janbina.habits.R
 import com.janbina.habits.helpers.DateFormatters
 import com.janbina.habits.helpers.px
-import com.janbina.habits.ui.compose.DateFormatterAmbient
-import com.janbina.habits.ui.compose.DeleteRed
-import com.janbina.habits.ui.compose.HabitsTheme
-import com.janbina.habits.ui.compose.RubikFontFamily
+import com.janbina.habits.ui.compose.*
 import com.kizitonwose.calendarview.CalendarView
 import com.kizitonwose.calendarview.model.CalendarMonth
 import com.kizitonwose.calendarview.model.InDateStyle
@@ -59,13 +55,13 @@ fun HabitDetailScreen(
                     HabitsAppBar(
                         onNavIconPressed = navController::navigateUp,
                         actions = {
-                            IconButton(onClick = viewModel::edit) {
-                                Icon(asset = Icons.Filled.Edit)
-                            }
-                            IconButton(onClick = { showDeleteDialog = true }) {
-                                Icon(asset = Icons.Filled.Delete)
-                            }
-                        })
+                            ToolbarButton(asset = Icons.Filled.Edit, onClick = viewModel::edit)
+                            ToolbarButton(
+                                asset = Icons.Filled.Delete,
+                                onClick = { showDeleteDialog = true }
+                            )
+                        }
+                    )
                     HabitHeader(it)
                     DayLegend(it)
                     Calendar(it, binder, viewModel::monthSelected)
@@ -124,10 +120,7 @@ fun HabitsAppBar(
             actions = actions,
             title = title,
             navigationIcon = {
-                IconButton(
-                    icon = { Icon(asset = Icons.Default.ArrowBack) },
-                    onClick = onNavIconPressed
-                )
+                ToolbarButton(asset = Icons.Default.ArrowBack, onClick = onNavIconPressed)
             }
         )
         Divider()
@@ -164,7 +157,11 @@ fun DayLegend(state: HabitDetailState) {
 }
 
 @Composable
-fun Calendar(state: HabitDetailState, binder: DayBinder<*>, monthSelectedListener: (CalendarMonth) -> Unit) {
+fun Calendar(
+    state: HabitDetailState,
+    binder: DayBinder<*>,
+    monthSelectedListener: (CalendarMonth) -> Unit
+) {
     AndroidView(
         modifier = Modifier.fillMaxWidth(),
         viewBlock = {
