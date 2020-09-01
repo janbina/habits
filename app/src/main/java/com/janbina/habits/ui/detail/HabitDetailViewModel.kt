@@ -31,7 +31,7 @@ data class HabitDetailState(
     val days: List<DayOfWeek> = DayOfWeek.values().toList()
 )
 
-class HabitDetailViewModelCompose @ViewModelInject constructor(
+class HabitDetailViewModel @ViewModelInject constructor(
     @Assisted state: SavedStateHandle,
     private val habitsRepository: HabitsRepository,
     private val daysRepository: DaysRepository

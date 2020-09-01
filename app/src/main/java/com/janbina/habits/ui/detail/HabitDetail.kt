@@ -9,20 +9,29 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.viewinterop.viewModel
 import androidx.core.view.doOnLayout
 import androidx.core.view.updateLayoutParams
+import androidx.navigation.NavController
+import androidx.navigation.Navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.mvrx.Fail
 import com.airbnb.mvrx.Incomplete
 import com.airbnb.mvrx.Success
 import com.janbina.habits.R
+import com.janbina.habits.helpers.DateFormatters
 import com.janbina.habits.helpers.px
 import com.janbina.habits.theme.Rubik
 import com.janbina.habits.ui.compose.DateFormatterAmbient
@@ -32,6 +41,40 @@ import com.kizitonwose.calendarview.model.InDateStyle
 import com.kizitonwose.calendarview.model.OutDateStyle
 import com.kizitonwose.calendarview.model.ScrollMode
 import com.kizitonwose.calendarview.ui.DayBinder
+
+@Composable
+fun HabitDetailScreen(
+    dateFormatters: DateFormatters,
+    navController: NavController,
+    binder: DayBinder<*>
+) {
+    val viewModel: HabitDetailViewModel = viewModel()
+    val viewState by viewModel.liveData.observeAsState()
+
+    Providers(
+        DateFormatterAmbient provides dateFormatters
+    ) {
+        MaterialTheme {
+            viewState?.let {
+                Column {
+                    HabitsAppBar(
+                        onNavIconPressed = navController::navigateUp,
+                        actions = {
+                            IconButton(onClick = viewModel::edit) {
+                                Icon(asset = Icons.Filled.Edit)
+                            }
+                            IconButton(onClick = {}) {
+                                Icon(asset = Icons.Filled.Delete)
+                            }
+                        })
+                    HabitHeader(it)
+                    DayLegend(it)
+                    Calendar(it, binder, viewModel::monthSelected)
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun HabitsAppBar(

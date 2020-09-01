@@ -25,7 +25,6 @@ import com.janbina.habits.databinding.ItemCalendarDayDetailBinding
 import com.janbina.habits.helpers.DateFormatters
 import com.janbina.habits.ui.base.BaseComposeFragment
 import com.janbina.habits.ui.base.FragmentArgs
-import com.janbina.habits.ui.compose.DateFormatterAmbient
 import com.janbina.habits.util.BindingDayBinder
 import com.kizitonwose.calendarview.model.DayOwner
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,7 +34,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class HabitDetailFragment : BaseComposeFragment() {
 
-    private val viewModel: HabitDetailViewModelCompose by viewModels()
+    private val viewModel: HabitDetailViewModel by viewModels()
 
     @Inject
     lateinit var dateFormatters: DateFormatters
@@ -49,30 +48,11 @@ class HabitDetailFragment : BaseComposeFragment() {
     ): View? {
         return ComposeView(requireContext()).apply {
             setContent {
-                Providers(
-                    DateFormatterAmbient provides dateFormatters
-                ) {
-                    MaterialTheme {
-                        val viewState by viewModel.liveData.observeAsState()
-                        viewState?.let {
-                            Column {
-                                HabitsAppBar(
-                                    onNavIconPressed = findNavController()::navigateUp,
-                                    actions = {
-                                        IconButton(onClick = viewModel::edit) {
-                                            Icon(asset = Icons.Filled.Edit)
-                                        }
-                                        IconButton(onClick = ::confirmDeletion) {
-                                            Icon(asset = Icons.Filled.Delete)
-                                        }
-                                    })
-                                HabitHeader(it)
-                                DayLegend(it)
-                                Calendar(it, dayBinder, viewModel::monthSelected)
-                            }
-                        }
-                    }
-                }
+                HabitDetailScreen(
+                    dateFormatters = dateFormatters,
+                    navController = findNavController(),
+                    binder = dayBinder
+                )
             }
         }
     }
@@ -93,7 +73,7 @@ class HabitDetailFragment : BaseComposeFragment() {
             .setNegativeButton("Cancel", null)
             .show()
     }
-    
+
     private val dayBinder = BindingDayBinder(ItemCalendarDayDetailBinding::bind) { day ->
         val epochDay = day.date.toEpochDay()
         dayText.text = dateFormatters.dayNumFormatter.format(day.date)
