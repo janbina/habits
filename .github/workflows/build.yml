@@ -24,13 +24,13 @@ jobs:
         java-version: 8
     
     - name: Decrypt secrets
-        run: ./release/decrypt-secrets.sh
-        env:
-          ENCRYPT_KEY: ${{ secrets.ENCRYPT_KEY }}
+      run: ./release/decrypt-secrets.sh
+      env:
+        ENCRYPT_KEY: ${{ secrets.ENCRYPT_KEY }}
 
     - name: Build with Gradle
       run: ./gradlew buildRelease
 
     - name: Clean secrets
-        if: always()
-        run: ./release/clean-secrets.sh
+      if: always()
+      run: ./release/clean-secrets.sh
