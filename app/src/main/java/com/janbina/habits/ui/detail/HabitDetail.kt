@@ -1,6 +1,7 @@
 package com.janbina.habits.ui.detail
 
 import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -28,6 +29,15 @@ import com.kizitonwose.calendarview.model.InDateStyle
 import com.kizitonwose.calendarview.model.OutDateStyle
 import com.kizitonwose.calendarview.model.ScrollMode
 import com.kizitonwose.calendarview.ui.DayBinder
+
+@Composable
+fun HabitHeader(state: HabitDetailStateCompose) {
+    val habit = state.habitDetail()
+    Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+        Text(text = habit?.habit?.name ?: "")
+        Text(text = DateFormatterAmbient.current.formatMonthNameOptionalYear(state.selectedMonth))
+    }
+}
 
 @Composable
 fun DayLegend(state: HabitDetailStateCompose) {

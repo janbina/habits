@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.*
@@ -68,6 +69,7 @@ class HabitDetailFragmentCompose : BaseComposeFragment() {
                         viewState?.let {
                             Column {
                                 TopAppBar {}
+                                HabitHeader(it)
                                 DayLegend(it)
                                 Calendar(it, dayBinder, viewModel::monthSelected)
                             }
