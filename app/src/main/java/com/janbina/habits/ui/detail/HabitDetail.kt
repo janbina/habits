@@ -1,11 +1,8 @@
 package com.janbina.habits.ui.detail
 
 import androidx.compose.foundation.Icon
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.Text
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.RowScope.gravity
 import androidx.compose.material.Divider
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -13,9 +10,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -27,7 +22,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.mvrx.Fail
 import com.airbnb.mvrx.Incomplete
 import com.airbnb.mvrx.Success
-import com.google.firebase.auth.ktx.actionCodeSettings
 import com.janbina.habits.R
 import com.janbina.habits.helpers.px
 import com.janbina.habits.theme.Rubik
@@ -65,7 +59,7 @@ fun HabitsAppBar(
 }
 
 @Composable
-fun HabitHeader(state: HabitDetailStateCompose) {
+fun HabitHeader(state: HabitDetailState) {
     val habit = state.habitDetail()
     Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
         Text(text = habit?.habit?.name ?: "")
@@ -74,7 +68,7 @@ fun HabitHeader(state: HabitDetailStateCompose) {
 }
 
 @Composable
-fun DayLegend(state: HabitDetailStateCompose) {
+fun DayLegend(state: HabitDetailState) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
     ) {
@@ -94,7 +88,7 @@ fun DayLegend(state: HabitDetailStateCompose) {
 }
 
 @Composable
-fun Calendar(state: HabitDetailStateCompose, binder: DayBinder<*>, monthSelectedListener: (CalendarMonth) -> Unit) {
+fun Calendar(state: HabitDetailState, binder: DayBinder<*>, monthSelectedListener: (CalendarMonth) -> Unit) {
     AndroidView(
         modifier = Modifier.fillMaxWidth(),
         viewBlock = {

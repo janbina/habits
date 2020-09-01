@@ -10,7 +10,7 @@ import com.janbina.habits.di.helpers.AssistedViewModelFactory
 import com.janbina.habits.di.helpers.DaggerVmFactory
 import com.janbina.habits.models.HabitDay
 import com.janbina.habits.ui.base.BaseViewModel
-import com.janbina.habits.ui.detail.HabitDetailFragmentCompose
+import com.janbina.habits.ui.detail.HabitDetailFragment
 import com.janbina.habits.ui.viewevent.NavigationEvent
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
@@ -49,7 +49,7 @@ class DayViewModel @AssistedInject constructor(
     }
 
     fun openHabit(habit: HabitDay) {
-        NavigationEvent(R.id.habitDetailFragmentCompose, HabitDetailFragmentCompose.Args(
+        NavigationEvent(R.id.habitDetailFragmentCompose, HabitDetailFragment.Args(
             habit.id, initialState.day
         )).publish()
     }

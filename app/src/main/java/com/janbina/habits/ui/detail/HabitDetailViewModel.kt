@@ -23,38 +23,29 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 
-data class HabitDetailStateCompose(
-    val args: HabitDetailFragmentCompose.Args,
-    val selectedMonth: YearMonth,
-    val startMonth: YearMonth,
-    val endMonth: YearMonth,
-    val habitDetail: Async<HabitsRepository.HabitDetail>,
-    val days: List<DayOfWeek>
-) {
-    constructor(args: HabitDetailFragmentCompose.Args) : this(
-        args,
-        LocalDate.ofEpochDay(args.day.toLong()).yearMonth,
-        YearMonth.now().minusYears(1),
-        YearMonth.now().plusYears(1),
-        Uninitialized,
-        DayOfWeek.values().toList()
-    )
-}
+data class HabitDetailState(
+    val selectedMonth: YearMonth = YearMonth.now(),
+    val startMonth: YearMonth = YearMonth.now().minusYears(1),
+    val endMonth: YearMonth = YearMonth.now().plusYears(1),
+    val habitDetail: Async<HabitsRepository.HabitDetail> = Uninitialized,
+    val days: List<DayOfWeek> = DayOfWeek.values().toList()
+)
 
 class HabitDetailViewModelCompose @ViewModelInject constructor(
     @Assisted state: SavedStateHandle,
     private val habitsRepository: HabitsRepository,
     private val daysRepository: DaysRepository
-) : BaseComposeViewModel<HabitDetailStateCompose>(HabitDetailStateCompose(state.getArgs())) {
+) : BaseComposeViewModel<HabitDetailState>(HabitDetailState()) {
 
-    private val args = state.getArgs<HabitDetailFragmentCompose.Args>()
+    private val args = state.getArgs<HabitDetailFragment.Args>()
     private val day = LocalDate.ofEpochDay(args.day.toLong())
 
     init {
-        viewModelScope.launch {
-            setState {
-                copy(days = daysRepository.getDaysOfWeekSorted())
-            }
+        viewModelScope.launchSetState {
+            copy(
+                selectedMonth = LocalDate.ofEpochDay(args.day.toLong()).yearMonth,
+                days = daysRepository.getDaysOfWeekSorted()
+            )
         }
 
         viewModelScope.launch {
@@ -84,7 +75,7 @@ class HabitDetailViewModelCompose @ViewModelInject constructor(
         val habit = it.habitDetail() ?: return@withState
         val epochDay = day.toEpochDay().toInt()
         habitsRepository.setHabitComplete(
-            it.args.id,
+            habit.habit.id,
             epochDay,
             habit.days.contains(epochDay.toLong()).not()
         )
@@ -117,5 +108,4 @@ class HabitDetailViewModelCompose @ViewModelInject constructor(
         }
         return end!!.yearMonth.plusYears(1)
     }
-
 }

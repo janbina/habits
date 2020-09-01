@@ -33,7 +33,7 @@ import kotlinx.android.parcel.Parcelize
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class HabitDetailFragmentCompose : BaseComposeFragment() {
+class HabitDetailFragment : BaseComposeFragment() {
 
     private val viewModel: HabitDetailViewModelCompose by viewModels()
 

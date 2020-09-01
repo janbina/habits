@@ -13,7 +13,6 @@ import androidx.viewbinding.ViewBinding
 import com.airbnb.mvrx.BaseMvRxFragment
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxView
-import com.janbina.habits.ui.detail.HabitDetailFragmentCompose
 import com.janbina.habits.ui.viewevent.NavigationEvent
 import kotlinx.coroutines.flow.*
 

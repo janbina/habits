@@ -22,6 +22,6 @@
 
     <fragment
         android:id="@+id/habitDetailFragmentCompose"
-        android:name="com.janbina.habits.ui.detail.HabitDetailFragmentCompose" />
+        android:name="com.janbina.habits.ui.detail.HabitDetailFragment" />
 
 </navigation>
