@@ -29,6 +29,7 @@ import com.janbina.habits.helpers.DateFormatters
 import com.janbina.habits.helpers.px
 import com.janbina.habits.ui.base.BaseComposeFragment
 import com.janbina.habits.ui.base.FragmentArgs
+import com.janbina.habits.ui.compose.DateFormatterAmbient
 import com.janbina.habits.util.BindingDayBinder
 import com.kizitonwose.calendarview.CalendarView
 import com.kizitonwose.calendarview.model.DayOwner
@@ -59,13 +60,18 @@ class HabitDetailFragmentCompose : BaseComposeFragment() {
     ): View? {
         return ComposeView(requireContext()).apply {
             setContent {
-                MaterialTheme {
-                    val viewState by viewModel.liveData.observeAsState()
-                    viewState?.let {
-                        Column {
-                            TopAppBar {}
-                            Calendar(it, dayBinder, viewModel::monthSelected)
-                        }   
+                Providers(
+                    DateFormatterAmbient provides dateFormatters
+                ) {
+                    MaterialTheme {
+                        val viewState by viewModel.liveData.observeAsState()
+                        viewState?.let {
+                            Column {
+                                TopAppBar {}
+                                DayLegend(it)
+                                Calendar(it, dayBinder, viewModel::monthSelected)
+                            }
+                        }
                     }
                 }
             }
