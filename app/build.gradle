@@ -1,7 +1,5 @@
 import org.ajoberstar.grgit.Grgit
 
-import java.nio.file.Files
-
 plugins {
     id "com.android.application"
     id "kotlin-android"
@@ -163,9 +161,4 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-livedata:2.2.0'
     implementation 'com.chibatching.kotpref:preference-screen-dsl:2.11.0'
     implementation "androidx.preference:preference-ktx:1.1.1"
-}
-
-def googleServices = file("google-services.json")
-if (!googleServices.exists()) {
-    Files.copy(file("fake-google-services.json").toPath(), googleServices.toPath())
 }
