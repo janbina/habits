@@ -86,6 +86,7 @@ android {
 
     buildFeatures {
         viewBinding true
+        compose true
     }
 
     compileOptions {
@@ -96,10 +97,16 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
+        useIR = true
         freeCompilerArgs += [
                 "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
                 "-Xuse-experimental=com.chibatching.kotpref.preference.dsl.ExperimentalPreferenceScreenDsl",
         ]
+    }
+
+    composeOptions {
+        kotlinCompilerVersion versions.kotlin
+        kotlinCompilerExtensionVersion versions.compose
     }
 }
 
@@ -162,4 +169,14 @@ dependencies {
     implementation 'com.github.janbina.Kotpref:kotpref:preference-dsl-SNAPSHOT'
     implementation 'com.github.janbina.Kotpref:preference-screen-dsl:preference-dsl-SNAPSHOT'
     implementation "androidx.preference:preference-ktx:1.1.1"
+
+    // Compose
+    implementation "androidx.compose.runtime:runtime:${versions.compose}"
+    implementation "androidx.compose.ui:ui:${versions.compose}"
+    implementation "androidx.compose.foundation:foundation:${versions.compose}"
+    implementation "androidx.compose.foundation:foundation-layout:${versions.compose}"
+    implementation "androidx.compose.material:material:${versions.compose}"
+    implementation "androidx.compose.runtime:runtime-livedata:${versions.compose}"
+    implementation "androidx.ui:ui-tooling:${versions.compose}"
+    implementation "com.google.android.material:compose-theme-adapter:${versions.compose}"
 }

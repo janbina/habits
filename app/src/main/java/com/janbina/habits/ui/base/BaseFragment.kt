@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
@@ -55,4 +56,8 @@ abstract class BaseFragment<T : ViewBinding>(
 
 abstract class FragmentArgs : Parcelable {
     fun toBundle() = bundleOf(MvRx.KEY_ARG to this)
+}
+
+inline fun <reified T: FragmentArgs> SavedStateHandle.getArgs(): T {
+    return get<T>(MvRx.KEY_ARG)!!
 }

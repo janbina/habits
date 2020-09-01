@@ -1,7 +1,6 @@
 package com.janbina.habits.ui.home
 
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.fragment.findNavController
 import com.airbnb.mvrx.*
 import com.github.kittinunf.result.failure
 import com.github.kittinunf.result.success
@@ -13,13 +12,10 @@ import com.janbina.habits.models.HabitDay
 import com.janbina.habits.ui.base.BaseViewModel
 import com.janbina.habits.ui.detail.HabitDetailFragment
 import com.janbina.habits.ui.viewevent.NavigationEvent
-import com.janbina.habits.ui.viewevent.ViewEvent
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 
 data class DayState(
     val day: Int,
@@ -53,7 +49,7 @@ class DayViewModel @AssistedInject constructor(
     }
 
     fun openHabit(habit: HabitDay) {
-        NavigationEvent(R.id.habitDetailFragment, HabitDetailFragment.Args(
+        NavigationEvent(R.id.habitDetailFragmentCompose, HabitDetailFragment.Args(
             habit.id, initialState.day
         )).publish()
     }

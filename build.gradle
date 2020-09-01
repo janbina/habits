@@ -3,6 +3,7 @@ buildscript {
             kotlin     : "1.4.0",
             hilt       : "2.28-alpha",
             hiltAndroid: "1.0.0-alpha02",
+            compose    : "1.0.0-alpha01",
     ]
 
     repositories {
