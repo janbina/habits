@@ -3,18 +3,14 @@ package com.janbina.habits.ui.detail
 import androidx.compose.foundation.Icon
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Divider
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -25,7 +21,6 @@ import androidx.compose.ui.viewinterop.viewModel
 import androidx.core.view.doOnLayout
 import androidx.core.view.updateLayoutParams
 import androidx.navigation.NavController
-import androidx.navigation.Navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.mvrx.Fail
 import com.airbnb.mvrx.Incomplete
@@ -35,6 +30,7 @@ import com.janbina.habits.helpers.DateFormatters
 import com.janbina.habits.helpers.px
 import com.janbina.habits.theme.Rubik
 import com.janbina.habits.ui.compose.DateFormatterAmbient
+import com.janbina.habits.ui.compose.DeleteRed
 import com.kizitonwose.calendarview.CalendarView
 import com.kizitonwose.calendarview.model.CalendarMonth
 import com.kizitonwose.calendarview.model.InDateStyle
@@ -51,6 +47,8 @@ fun HabitDetailScreen(
     val viewModel: HabitDetailViewModel = viewModel()
     val viewState by viewModel.liveData.observeAsState()
 
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
     Providers(
         DateFormatterAmbient provides dateFormatters
     ) {
@@ -63,7 +61,7 @@ fun HabitDetailScreen(
                             IconButton(onClick = viewModel::edit) {
                                 Icon(asset = Icons.Filled.Edit)
                             }
-                            IconButton(onClick = {}) {
+                            IconButton(onClick = { showDeleteDialog = true }) {
                                 Icon(asset = Icons.Filled.Delete)
                             }
                         })
@@ -71,9 +69,43 @@ fun HabitDetailScreen(
                     DayLegend(it)
                     Calendar(it, binder, viewModel::monthSelected)
                 }
+
+                if (showDeleteDialog) {
+                    DeleteDialog(
+                        state = it,
+                        viewModel = viewModel,
+                        hide = { showDeleteDialog = false }
+                    )
+                }
             }
         }
     }
+}
+
+@Composable
+fun DeleteDialog(state: HabitDetailState, viewModel: HabitDetailViewModel, hide: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = hide,
+        buttons = {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+                modifier = Modifier.fillMaxWidth().padding(end = 16.dp, bottom = 12.dp)
+            ) {
+                TextButton(onClick = hide, contentColor = MaterialTheme.colors.onSurface) {
+                    Text(text = "Cancel")
+                }
+                TextButton(onClick = viewModel::delete, contentColor = DeleteRed) {
+                    Text(text = "Delete")
+                }
+            }
+        },
+        title = {
+            Text(text = "Delete ${state.habitDetail()?.habit?.name}")
+        },
+        text = {
+            Text("Are you sure you want to delete this habit? You will lose all the history and it cannot be undone.")
+        },
+    )
 }
 
 @Composable
@@ -115,7 +147,7 @@ fun DayLegend(state: HabitDetailState) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
     ) {
-        state.days.forEach { 
+        state.days.forEach {
             Text(
                 modifier = Modifier.weight(1F),
                 textAlign = TextAlign.Center,
@@ -157,7 +189,6 @@ fun Calendar(state: HabitDetailState, binder: DayBinder<*>, monthSelectedListene
         when (state.habitDetail) {
             is Incomplete -> Unit
             is Success -> {
-                //binding.name.text = it.habitDetail()?.habit?.name
                 view.layoutManager?.let {
                     view.notifyCalendarChanged()
                 }

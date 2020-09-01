@@ -5,22 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.Icon
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.runtime.Providers
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.janbina.habits.R
 import com.janbina.habits.databinding.ItemCalendarDayDetailBinding
 import com.janbina.habits.helpers.DateFormatters
 import com.janbina.habits.ui.base.BaseComposeFragment
@@ -61,17 +49,6 @@ class HabitDetailFragment : BaseComposeFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.handleNavigationEvents()
-    }
-
-    private fun confirmDeletion() {
-        MaterialAlertDialogBuilder(requireContext(), R.style.DeleteAlertDialog)
-            .setTitle("Delete ${viewModel.currentState().habitDetail()?.habit?.name}")
-            .setMessage("Are you sure you want to delete this habit? You will lose all the history and it cannot be undone.")
-            .setPositiveButton("Delete") { _, _ ->
-                viewModel.delete()
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
     }
 
     private val dayBinder = BindingDayBinder(ItemCalendarDayDetailBinding::bind) { day ->
