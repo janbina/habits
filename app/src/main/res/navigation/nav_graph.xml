@@ -35,4 +35,8 @@
         android:name="com.janbina.habits.ui.detail.HabitDetailFragment"
         tools:layout="@layout/fragment_habit_detail" />
 
+    <fragment
+        android:id="@+id/habitDetailFragmentCompose"
+        android:name="com.janbina.habits.ui.detail.HabitDetailFragmentCompose" />
+
 </navigation>
