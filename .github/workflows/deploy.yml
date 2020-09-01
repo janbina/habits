@@ -3,12 +3,15 @@ name: Deploy
 on:
   push:
     branches:
-      - master
+      - dev
+  release:
+    types:
+      - created
 
 jobs:
   build:
+    name: Deploy
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     env:
       ORG_GRADLE_PROJECT_HABITS_RELEASE_KEYSTORE_PWD: ${{ secrets.HABITS_RELEASE_KEYSTORE_PWD }}
       ORG_GRADLE_PROJECT_HABITS_RELEASE_KEY_PWD: ${{ secrets.HABITS_RELEASE_KEY_PWD }}
