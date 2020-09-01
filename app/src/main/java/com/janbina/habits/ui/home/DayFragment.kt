@@ -15,7 +15,7 @@ class DayFragment : BaseFragment<FragmentDayBinding>(FragmentDayBinding::inflate
     private val viewModel: DayViewModel by fragmentViewModel()
 
     override fun setupRegistrations() {
-        handleNavigationEvents(viewModel)
+        viewModel.handleNavigationEvents()
     }
 
     override fun invalidate() = withState(viewModel) {

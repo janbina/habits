@@ -13,8 +13,7 @@ import com.airbnb.mvrx.BaseMvRxFragment
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxView
 import com.janbina.habits.ui.viewevent.NavigationEvent
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 
 abstract class BaseFragment<T : ViewBinding>(
     private val inflate: (LayoutInflater, ViewGroup?, Boolean) -> T
@@ -26,17 +25,10 @@ abstract class BaseFragment<T : ViewBinding>(
     protected open fun setupView() {}
     protected open fun setupRegistrations() {}
 
-    protected fun handleNavigationEvents(viewModel: BaseViewModel<*>) {
-        viewModel.viewEvents
-            .onEach {
-                if (it != null && it.isConsumed.not()) {
-                    if (it is NavigationEvent) {
-                        it.consume()
-                        it.navigate(findNavController())
-                    }
-                }
-            }
-            .launchIn(lifecycleScope)
+    protected fun BaseViewModel<*>.handleNavigationEvents() {
+        onEachEvent<NavigationEvent> {
+            it.navigate(findNavController())
+        }.launchIn(lifecycleScope)
     }
 
     override fun onCreateView(

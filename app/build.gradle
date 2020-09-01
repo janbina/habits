@@ -128,13 +128,13 @@ dependencies {
 
     implementation "com.jakewharton.timber:timber:4.7.1"
 
-    implementation "com.google.android.material:material:1.2.0"
+    implementation "com.google.android.material:material:1.3.0-alpha02"
 
     //implementation "com.github.kizitonwose:CalendarView:0.4.3"
-    implementation 'com.github.janbina:CalendarView:3a00a04b8c'
+    implementation 'com.github.janbina:CalendarView:6b16bdb842'
 
     implementation "com.google.firebase:firebase-core:17.5.0"
-    implementation "com.google.firebase:firebase-auth:19.3.2"
+    implementation "com.google.firebase:firebase-auth-ktx:19.3.2"
     implementation 'com.google.firebase:firebase-firestore-ktx:21.5.0'
     implementation "com.google.android.gms:play-services-auth:18.1.0"
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
@@ -156,9 +156,10 @@ dependencies {
     implementation "com.squareup.inject:assisted-inject-annotations-dagger2:0.5.2"
     kapt "com.squareup.inject:assisted-inject-processor-dagger2:0.5.2"
 
-    implementation 'com.chibatching.kotpref:kotpref:2.11.0'
-    implementation 'com.chibatching.kotpref:livedata-support:2.11.0'
-    implementation 'androidx.lifecycle:lifecycle-livedata:2.2.0'
-    implementation 'com.chibatching.kotpref:preference-screen-dsl:2.11.0'
+    //implementation 'com.chibatching.kotpref:kotpref:2.11.0'
+    //implementation 'com.chibatching.kotpref:livedata-support:2.11.0'
+    //implementation 'com.chibatching.kotpref:preference-screen-dsl:2.11.0'
+    implementation 'com.github.janbina.Kotpref:kotpref:preference-dsl-SNAPSHOT'
+    implementation 'com.github.janbina.Kotpref:preference-screen-dsl:preference-dsl-SNAPSHOT'
     implementation "androidx.preference:preference-ktx:1.1.1"
 }

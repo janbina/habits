@@ -1,21 +1,25 @@
 package com.janbina.habits.ui.home
 
-import android.graphics.Color
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.core.view.children
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.airbnb.mvrx.existingViewModel
 import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.withState
+import com.google.android.material.snackbar.Snackbar
 import com.janbina.habits.R
 import com.janbina.habits.databinding.Example7DayBinding
 import com.janbina.habits.databinding.FragmentHomeBinding
 import com.janbina.habits.helpers.*
+import com.janbina.habits.ui.LoginViewModel
 import com.janbina.habits.ui.base.BaseFragment
 import com.janbina.habits.util.onPageSelected
 import com.janbina.habits.util.setMenuActions
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -25,18 +29,38 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     @Inject
     lateinit var dateFormatters: DateFormatters
     private val viewModel: HomeViewModel by fragmentViewModel()
+    private val loginViewModel: LoginViewModel by existingViewModel()
 
-    override fun invalidate() = withState(viewModel) {
+    override fun invalidate() = withState(viewModel, loginViewModel) { it, login ->
+        binding.toolbar.title = dateFormatters.formatRelative(it.selectedDate)
+        updateDayStrip(it)
+
+        binding.loginSheet.isVisible = login.loggedIn.not()
+        binding.loginInclude.loginProg.isVisible = login.inProgress
+
         binding.viewPager.setCurrentItem(
             it.selectedDate.toEpochDay().toInt(),
             binding.viewPager.currentItem != 0
         )
-        binding.toolbar.title = dateFormatters.formatRelative(it.selectedDate)
-        updateDayStrip(it)
     }
 
     override fun setupRegistrations() {
-        handleNavigationEvents(viewModel)
+        viewModel.handleNavigationEvents()
+
+        loginViewModel.onEachEvent<LoginViewModel.SignInFinishedEvent> {
+            when (it) {
+                is LoginViewModel.SignInFinishedEvent.Success -> {
+                    binding.viewPager.adapter = ViewPagerAdapter(this@HomeFragment)
+                }
+                is LoginViewModel.SignInFinishedEvent.Error -> {
+                    Snackbar.make(binding.root, "Login failed, try again", Snackbar.LENGTH_SHORT).show()
+                }
+            }
+        }.launchIn(lifecycleScope)
+
+        loginViewModel.onEachEvent<LoginViewModel.LoggedOutEvent> {
+
+        }.launchIn(lifecycleScope)
     }
 
     override fun setupView() = with(binding) {
@@ -48,6 +72,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         )
 
         viewPager.adapter = ViewPagerAdapter(this@HomeFragment)
+
+        loginInclude.loginButton.setOnClickListener {
+            loginViewModel.loginWithGoogle()
+        }
+
         viewPager.onPageSelected {
             if (it != 0) {
                 dateSelected(it)
