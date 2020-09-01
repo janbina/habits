@@ -28,9 +28,10 @@ import com.airbnb.mvrx.Success
 import com.janbina.habits.R
 import com.janbina.habits.helpers.DateFormatters
 import com.janbina.habits.helpers.px
-import com.janbina.habits.theme.Rubik
 import com.janbina.habits.ui.compose.DateFormatterAmbient
 import com.janbina.habits.ui.compose.DeleteRed
+import com.janbina.habits.ui.compose.HabitsTheme
+import com.janbina.habits.ui.compose.RubikFontFamily
 import com.kizitonwose.calendarview.CalendarView
 import com.kizitonwose.calendarview.model.CalendarMonth
 import com.kizitonwose.calendarview.model.InDateStyle
@@ -52,7 +53,7 @@ fun HabitDetailScreen(
     Providers(
         DateFormatterAmbient provides dateFormatters
     ) {
-        MaterialTheme {
+        HabitsTheme {
             viewState?.let {
                 Column {
                     HabitsAppBar(
@@ -154,7 +155,7 @@ fun DayLegend(state: HabitDetailState) {
                 text = DateFormatterAmbient.current.shortDayNameFormatter.format(it).toUpperCase(),
                 style = MaterialTheme.typography.body1.copy(
                     fontSize = 10.sp,
-                    fontFamily = Rubik,
+                    fontFamily = RubikFontFamily,
                     fontWeight = FontWeight.W300
                 )
             )
