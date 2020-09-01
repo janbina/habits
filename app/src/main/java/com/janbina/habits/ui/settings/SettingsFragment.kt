@@ -9,6 +9,7 @@ import com.airbnb.mvrx.withState
 import com.chibatching.kotpref.preference.dsl.PreferenceScreenBuilder
 import com.chibatching.kotpref.preference.dsl.kotprefScreen
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.janbina.habits.BuildConfig
 import com.janbina.habits.R
 import com.janbina.habits.data.preferences.Preferences
 import com.janbina.habits.databinding.FragmentSettingsBinding
@@ -52,6 +53,11 @@ class SettingsFragment :
                 entryValues = Preferences.Theme.values()
                     .map { it.value }
                     .toTypedArray()
+            }
+            category("About") {
+                preference(KEY_VERSION, "Version") {
+                    summary = BuildConfig.VERSION_NAME
+                }
             }
         }
     }
@@ -109,5 +115,6 @@ class SettingsFragment :
 
     companion object {
         private const val KEY_LOGGED_USER = "logged_user"
+        private const val KEY_VERSION = "version"
     }
 }
