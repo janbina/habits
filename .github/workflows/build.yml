@@ -10,6 +10,10 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    env:
+      ORG_GRADLE_PROJECT_HABITS_RELEASE_KEYSTORE_PWD: ${{ secrets.HABITS_RELEASE_KEYSTORE_PWD }}
+      ORG_GRADLE_PROJECT_HABITS_RELEASE_KEY_PWD: ${{ secrets.HABITS_RELEASE_KEY_PWD }}
+      ORG_GRADLE_PROJECT_HABITS_SERVER_CLIENT_ID: ${{ secrets.HABITS_SERVER_CLIENT_ID }}
 
     steps:
     - uses: actions/checkout@v2
@@ -18,7 +22,15 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 8
+    
+    - name: Decrypt secrets
+      run: ./release/decrypt-secrets.sh
+      env:
+        ENCRYPT_KEY: ${{ secrets.ENCRYPT_KEY }}
 
     - name: Build with Gradle
-      run: ./gradlew build
-      
+      run: ./gradlew buildRelease
+
+    - name: Clean secrets
+      if: always()
+      run: ./release/clean-secrets.sh
