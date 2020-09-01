@@ -6,12 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import com.airbnb.mvrx.BaseMvRxFragment
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxView
+import com.janbina.habits.ui.detail.HabitDetailFragmentCompose
 import com.janbina.habits.ui.viewevent.NavigationEvent
 import kotlinx.coroutines.flow.*
 
@@ -55,4 +57,8 @@ abstract class BaseFragment<T : ViewBinding>(
 
 abstract class FragmentArgs : Parcelable {
     fun toBundle() = bundleOf(MvRx.KEY_ARG to this)
+}
+
+inline fun <reified T: FragmentArgs> SavedStateHandle.getArgs(): T {
+    return get<T>(MvRx.KEY_ARG)!!
 }
