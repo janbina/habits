@@ -163,11 +163,8 @@ dependencies {
     implementation "com.squareup.inject:assisted-inject-annotations-dagger2:0.5.2"
     kapt "com.squareup.inject:assisted-inject-processor-dagger2:0.5.2"
 
-    //implementation 'com.chibatching.kotpref:kotpref:2.11.0'
-    //implementation 'com.chibatching.kotpref:livedata-support:2.11.0'
-    //implementation 'com.chibatching.kotpref:preference-screen-dsl:2.11.0'
-    implementation 'com.github.janbina.Kotpref:kotpref:preference-dsl-SNAPSHOT'
-    implementation 'com.github.janbina.Kotpref:preference-screen-dsl:preference-dsl-SNAPSHOT'
+    implementation 'com.github.chibatching.Kotpref:kotpref:master-SNAPSHOT'
+    implementation 'com.github.chibatching.Kotpref:preference-screen-dsl:master-SNAPSHOT'
     implementation "androidx.preference:preference-ktx:1.1.1"
 
     // Compose
