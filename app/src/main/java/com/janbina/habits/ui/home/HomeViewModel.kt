@@ -5,7 +5,7 @@ import com.janbina.habits.R
 import com.janbina.habits.di.helpers.AssistedViewModelFactory
 import com.janbina.habits.di.helpers.DaggerVmFactory
 import com.janbina.habits.ui.base.BaseViewModel
-import com.janbina.habits.ui.create.CreateFragmentCompose
+import com.janbina.habits.ui.create.CreateFragment
 import com.janbina.habits.ui.viewevent.NavigationEvent
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
@@ -29,7 +29,7 @@ class HomeViewModel @AssistedInject constructor(
     }
 
     fun goToHabitCreation() {
-        NavigationEvent(R.id.createFragmentCompose, CreateFragmentCompose.Args()).publish()
+        NavigationEvent(R.id.createFragment, CreateFragment.Args()).publish()
     }
 
     @AssistedInject.Factory

@@ -49,7 +49,7 @@ class DayViewModel @AssistedInject constructor(
     }
 
     fun openHabit(habit: HabitDay) {
-        NavigationEvent(R.id.habitDetailFragmentCompose, HabitDetailFragment.Args(
+        NavigationEvent(R.id.habitDetailFragment, HabitDetailFragment.Args(
             habit.id, initialState.day
         )).publish()
     }

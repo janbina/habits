@@ -12,7 +12,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.parcel.Parcelize
 
 @AndroidEntryPoint
-class CreateFragmentCompose : BaseComposeFragment() {
+class CreateFragment : BaseComposeFragment() {
 
     private val viewModel: CreateViewModelCompose by viewModels()
 
