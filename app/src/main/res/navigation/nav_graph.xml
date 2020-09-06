@@ -16,11 +16,6 @@
         tools:layout="@layout/fragment_settings" />
 
     <fragment
-        android:id="@+id/createFragment"
-        android:name="com.janbina.habits.ui.create.CreateFragment"
-        tools:layout="@layout/fragment_create" />
-
-    <fragment
         android:id="@+id/habitDetailFragmentCompose"
         android:name="com.janbina.habits.ui.detail.HabitDetailFragment" />
 
