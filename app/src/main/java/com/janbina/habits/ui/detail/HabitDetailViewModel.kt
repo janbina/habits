@@ -15,6 +15,7 @@ import com.janbina.habits.data.repository.HabitsRepository
 import com.janbina.habits.ui.base.BaseComposeViewModel
 import com.janbina.habits.ui.base.getArgs
 import com.janbina.habits.ui.create.CreateFragment
+import com.janbina.habits.ui.create.CreateFragmentCompose
 import com.janbina.habits.ui.viewevent.NavigationEvent
 import com.kizitonwose.calendarview.model.CalendarMonth
 import com.kizitonwose.calendarview.utils.yearMonth
@@ -88,8 +89,8 @@ class HabitDetailViewModel @ViewModelInject constructor(
 
     fun edit() {
         NavigationEvent(
-            R.id.createFragment,
-            CreateFragment.Args(args.id).toBundle()
+            R.id.createFragmentCompose,
+            CreateFragmentCompose.Args(args.id).toBundle()
         ).publish()
     }
 
