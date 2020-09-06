@@ -1,42 +1,30 @@
 package com.janbina.habits.ui.create
 
-import androidx.core.widget.doAfterTextChanged
+import android.os.Bundle
+import android.view.View
+import androidx.compose.runtime.Composable
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.airbnb.mvrx.fragmentViewModel
-import com.airbnb.mvrx.withState
-import com.janbina.habits.databinding.FragmentCreateBinding
-import com.janbina.habits.ui.base.BaseFragment
+import com.janbina.habits.ui.base.BaseComposeFragment
 import com.janbina.habits.ui.base.FragmentArgs
-import com.janbina.habits.util.*
+import com.janbina.habits.ui.detail.HabitDetailScreen
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.parcel.Parcelize
 
 @AndroidEntryPoint
-class CreateFragment : BaseFragment<FragmentCreateBinding>(FragmentCreateBinding::inflate) {
+class CreateFragment : BaseComposeFragment() {
 
-    private val viewModel: CreateViewModel by fragmentViewModel()
+    private val viewModel: CreateViewModelCompose by viewModels()
 
-    override fun setupView() = with(binding) {
-        toolbar.setNavigationOnClickListener {
-            findNavController().navigateUp()
-        }
-        habitName.doAfterTextChanged { viewModel.nameChanged(habitName.text.toString()) }
-        saveButton.setOnClickListener { viewModel.save() }
+    @Composable
+    override fun content() = CreateScreen(
+        navController = findNavController()
+    )
 
-        habitName.showImeDelayed()
-    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    override fun setupRegistrations() {
         viewModel.handleNavigationEvents()
-    }
-
-    override fun invalidate() = withState(viewModel) {
-        binding.habitName.updateText(it.name)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        hideIme()
     }
 
     @Parcelize
@@ -44,3 +32,4 @@ class CreateFragment : BaseFragment<FragmentCreateBinding>(FragmentCreateBinding
         val id: String? = null
     ) : FragmentArgs()
 }
+

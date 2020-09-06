@@ -1,60 +1,45 @@
 package com.janbina.habits.ui.create
 
+import androidx.hilt.Assisted
+import androidx.hilt.lifecycle.ViewModelInject
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.airbnb.mvrx.MvRxState
-import com.github.kittinunf.result.success
+import com.github.kittinunf.result.Result
 import com.janbina.habits.data.repository.HabitsRepository
-import com.janbina.habits.di.helpers.AssistedViewModelFactory
-import com.janbina.habits.di.helpers.DaggerVmFactory
-import com.janbina.habits.ui.base.BaseViewModel
+import com.janbina.habits.ui.base.BaseComposeViewModel
+import com.janbina.habits.ui.base.getArgs
 import com.janbina.habits.ui.viewevent.NavigationEvent
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.launch
 
 data class CreateState(
-    val args: CreateFragment.Args,
-    val name: String
-) : MvRxState {
-    @Suppress("unused")
-    constructor(args: CreateFragment.Args): this(args, "")
-}
+    val name: String = ""
+)
 
-class CreateViewModel @AssistedInject constructor(
-    @Assisted private val initialState: CreateState,
+class CreateViewModelCompose @ViewModelInject constructor(
+    @Assisted state: SavedStateHandle,
     private val habitsRepository: HabitsRepository
-) : BaseViewModel<CreateState>(initialState) {
+) : BaseComposeViewModel<CreateState>(CreateState()) {
+
+    private val args = state.getArgs<CreateFragment.Args>()
 
     init {
         loadHabit()
     }
 
-    fun nameChanged(name: String) = setState {
+    fun nameChanged(name: String) = viewModelScope.launchSetState {
         copy(name = name)
     }
 
-    fun save() = withState {
-        habitsRepository.saveHabit(initialState.args.id, it.name)
+    fun save() = viewModelScope.withState {
+        habitsRepository.saveHabit(args.id, it.name)
         NavigationEvent.back().publish()
     }
 
-    private fun loadHabit() {
-        val id = initialState.args.id ?: return
-        viewModelScope.launch {
-            habitsRepository.getHabitInfo(id).success {
-                setState {
-                    copy(name = it.name)
-                }
-            }
+    private fun loadHabit() = viewModelScope.launch {
+        args.id ?: return@launch
+        val habit = habitsRepository.getHabitInfo(args.id)
+        if (habit is Result.Success) {
+            setState { copy(name = habit.value.name) }
         }
     }
-
-    @AssistedInject.Factory
-    interface Factory : AssistedViewModelFactory<CreateViewModel, CreateState> {
-        override fun create(initialState: CreateState): CreateViewModel
-    }
-
-    companion object :
-        DaggerVmFactory<CreateViewModel, CreateState>(CreateViewModel::class.java)
-
 }

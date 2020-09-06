@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -44,7 +45,7 @@ fun HabitDetailScreen(
     val viewModel: HabitDetailViewModel = viewModel()
     val viewState by viewModel.liveData.observeAsState()
 
-    var showDeleteDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by savedInstanceState { false }
 
     Providers(
         DateFormatterAmbient provides dateFormatters
@@ -86,7 +87,7 @@ fun DeleteDialog(state: HabitDetailState, viewModel: HabitDetailViewModel, hide:
         buttons = {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
-                modifier = Modifier.fillMaxWidth().padding(end = 16.dp, bottom = 12.dp)
+                modifier = Modifier.fillMaxWidth().padding(end = 8.dp, bottom = 8.dp)
             ) {
                 TextButton(onClick = hide, contentColor = MaterialTheme.colors.onSurface) {
                     Text(text = "Cancel")
