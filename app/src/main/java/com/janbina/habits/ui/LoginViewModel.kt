@@ -22,7 +22,7 @@ import timber.log.Timber
 data class LoginState(
     val user: User? = null,
     val inProgress: Boolean = false
-) : MvRxState {
+) : MavericksState {
     val loggedIn get() = user != null
 }
 

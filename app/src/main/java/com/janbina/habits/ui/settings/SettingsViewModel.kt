@@ -1,7 +1,7 @@
 package com.janbina.habits.ui.settings
 
 import androidx.lifecycle.viewModelScope
-import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MavericksState
 import com.janbina.habits.data.repository.AuthRepository
 import com.janbina.habits.data.repository.HabitsRepository
 import com.janbina.habits.di.helpers.AssistedViewModelFactory
@@ -11,7 +11,7 @@ import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.launch
 
-data class SettingsState(val x: String = "") : MvRxState
+data class SettingsState(val x: String = "") : MavericksState
 
 class SettingsViewModel @AssistedInject constructor(
     @Assisted initialState: SettingsState,

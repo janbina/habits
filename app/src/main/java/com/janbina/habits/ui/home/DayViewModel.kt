@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.onEach
 data class DayState(
     val day: Int,
     val habits: Async<List<HabitDay>>,
-) : MvRxState {
+) : MavericksState {
     @Suppress("unused")
     constructor(args: DayFragment.Args) : this(
         args.day,

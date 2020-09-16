@@ -8,11 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
-import com.airbnb.mvrx.BaseMvRxFragment
-import com.airbnb.mvrx.MvRxView
-import com.janbina.habits.ui.detail.HabitDetailScreen
 import com.janbina.habits.ui.viewevent.NavigationEvent
 import kotlinx.coroutines.flow.launchIn
 
