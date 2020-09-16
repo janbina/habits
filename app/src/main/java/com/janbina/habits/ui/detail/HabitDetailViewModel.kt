@@ -29,7 +29,7 @@ data class HabitDetailState(
     val endMonth: YearMonth,
     val habitDetail: Async<HabitsRepository.HabitDetail>,
     val days: List<DayOfWeek>
-) : MvRxState {
+) : MavericksState {
     @Suppress("unused")
     constructor(args: HabitDetailFragment.Args) : this(
         args,

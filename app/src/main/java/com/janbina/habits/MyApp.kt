@@ -2,8 +2,9 @@ package com.janbina.habits
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
+import com.airbnb.mvrx.Mavericks
+import com.airbnb.mvrx.MavericksViewModelConfigFactory
 import com.janbina.habits.data.ThemeProvider
-import com.janbina.habits.data.preferences.Preferences
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 import javax.inject.Inject
@@ -15,6 +16,8 @@ class MyApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        Mavericks.viewModelConfigFactory = MavericksViewModelConfigFactory(applicationContext)
 
         AppCompatDelegate.setDefaultNightMode(themeProvider.getCurrentTheme())
 

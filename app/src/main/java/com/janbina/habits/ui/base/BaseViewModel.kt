@@ -1,14 +1,11 @@
 package com.janbina.habits.ui.base
 
-import androidx.lifecycle.lifecycleScope
-import com.airbnb.mvrx.BaseMvRxViewModel
-import com.airbnb.mvrx.BuildConfig
-import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MavericksState
+import com.airbnb.mvrx.MavericksViewModel
 import com.janbina.habits.ui.viewevent.ViewEvent
 import kotlinx.coroutines.flow.*
 
-abstract class BaseViewModel<S : MvRxState>(initialState: S) :
-    BaseMvRxViewModel<S>(initialState, debugMode = BuildConfig.DEBUG) {
+abstract class BaseViewModel<S : MavericksState>(initialState: S) : MavericksViewModel<S>(initialState) {
 
     private val _viewEvents = MutableStateFlow<ViewEvent?>(null)
     val viewEvents: StateFlow<ViewEvent?> get() = _viewEvents

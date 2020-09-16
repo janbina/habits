@@ -1,7 +1,7 @@
 package com.janbina.habits.ui.create
 
 import androidx.lifecycle.viewModelScope
-import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MavericksState
 import com.github.kittinunf.result.success
 import com.janbina.habits.data.repository.HabitsRepository
 import com.janbina.habits.di.helpers.AssistedViewModelFactory
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 data class CreateState(
     val args: CreateFragment.Args,
     val name: String
-) : MvRxState {
+) : MavericksState {
     @Suppress("unused")
     constructor(args: CreateFragment.Args): this(args, "")
 }
