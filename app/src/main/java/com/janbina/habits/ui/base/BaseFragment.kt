@@ -6,18 +6,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
-import com.airbnb.mvrx.BaseMvRxFragment
-import com.airbnb.mvrx.MvRx
-import com.airbnb.mvrx.MvRxView
+import com.airbnb.mvrx.*
 import com.janbina.habits.ui.viewevent.NavigationEvent
 import kotlinx.coroutines.flow.*
 
 abstract class BaseFragment<T : ViewBinding>(
     private val inflate: (LayoutInflater, ViewGroup?, Boolean) -> T
-) : BaseMvRxFragment(), MvRxView {
+) : Fragment(), MavericksView {
 
     private var _binding: T? = null
     protected val binding get() = _binding!!
@@ -54,5 +53,5 @@ abstract class BaseFragment<T : ViewBinding>(
 }
 
 abstract class FragmentArgs : Parcelable {
-    fun toBundle() = bundleOf(MvRx.KEY_ARG to this)
+    fun toBundle() = bundleOf(Mavericks.KEY_ARG to this)
 }

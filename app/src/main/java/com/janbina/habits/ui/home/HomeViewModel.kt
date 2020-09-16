@@ -1,6 +1,6 @@
 package com.janbina.habits.ui.home
 
-import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MavericksState
 import com.janbina.habits.R
 import com.janbina.habits.di.helpers.AssistedViewModelFactory
 import com.janbina.habits.di.helpers.DaggerVmFactory
@@ -14,7 +14,7 @@ import java.time.LocalDate
 data class HomeState(
     val selectedDate: LocalDate = LocalDate.now(),
     val daysShown: List<LocalDate> = (-4L..2L).map { selectedDate.plusDays(it) }
-) : MvRxState
+) : MavericksState
 
 class HomeViewModel @AssistedInject constructor(
     @Assisted initialState: HomeState,
