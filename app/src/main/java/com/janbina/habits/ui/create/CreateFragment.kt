@@ -3,13 +3,13 @@ package com.janbina.habits.ui.create
 import androidx.compose.runtime.Composable
 import androidx.navigation.fragment.findNavController
 import com.airbnb.mvrx.fragmentViewModel
-import com.janbina.habits.ui.base.BaseComposeMavericksFragment
+import com.janbina.habits.ui.base.BaseComposeFragment
 import com.janbina.habits.ui.base.FragmentArgs
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.parcel.Parcelize
 
 @AndroidEntryPoint
-class CreateFragment : BaseComposeMavericksFragment() {
+class CreateFragment : BaseComposeFragment() {
 
     private val viewModel: CreateViewModel by fragmentViewModel()
 

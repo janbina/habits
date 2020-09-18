@@ -8,7 +8,7 @@ import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.withState
 import com.janbina.habits.databinding.ItemCalendarDayDetailBinding
 import com.janbina.habits.helpers.DateFormatters
-import com.janbina.habits.ui.base.BaseComposeMavericksFragment
+import com.janbina.habits.ui.base.BaseComposeFragment
 import com.janbina.habits.ui.base.FragmentArgs
 import com.janbina.habits.util.BindingDayBinder
 import com.kizitonwose.calendarview.model.DayOwner
@@ -17,7 +17,7 @@ import kotlinx.android.parcel.Parcelize
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class HabitDetailFragment : BaseComposeMavericksFragment() {
+class HabitDetailFragment : BaseComposeFragment() {
 
     @Inject
     lateinit var dateFormatters: DateFormatters
