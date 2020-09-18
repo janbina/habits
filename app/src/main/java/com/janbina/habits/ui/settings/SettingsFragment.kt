@@ -1,10 +1,10 @@
 package com.janbina.habits.ui.settings
 
 import android.os.Bundle
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.preference.ListPreference
 import androidx.preference.Preference
+import com.airbnb.mvrx.existingViewModel
 import com.airbnb.mvrx.withState
 import com.chibatching.kotpref.preference.dsl.PreferenceScreenBuilder
 import com.chibatching.kotpref.preference.dsl.kotprefScreen
@@ -24,7 +24,7 @@ import kotlin.reflect.KProperty0
 class SettingsFragment :
     BasePreferenceFragment<FragmentSettingsBinding>(FragmentSettingsBinding::bind) {
 
-    private val loginViewModel: LoginViewModel by activityViewModels()
+    private val loginViewModel: LoginViewModel by existingViewModel()
 
     @Inject
     lateinit var preferences: Preferences
@@ -55,8 +55,13 @@ class SettingsFragment :
                     .toTypedArray()
             }
             category("About") {
+                val versionName = if (BuildConfig.BUILD_TYPE == "release") {
+                    BuildConfig.VERSION_NAME
+                } else {
+                    "${BuildConfig.VERSION_NAME} (${BuildConfig.BUILD_TYPE})"
+                }
                 preference(KEY_VERSION, "Version") {
-                    summary = BuildConfig.VERSION_NAME
+                    summary = versionName
                 }
             }
         }

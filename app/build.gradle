@@ -32,6 +32,8 @@ play {
     serviceAccountCredentials = rootProject.file('release/play-account.json')
 }
 
+def appName = "Habits"
+
 android {
     compileSdkVersion 30
 
@@ -50,6 +52,8 @@ android {
                 arguments["dagger.hilt.disableModulesHaveInstallInCheck"] = "true"
             }
         }
+
+        resValue "string", "app_name", "${appName}"
     }
 
     signingConfigs {
@@ -74,6 +78,7 @@ android {
             signingConfig signingConfigs.debug
 
             buildConfigField "String", "SERVER_CLIENT_ID", propOrDef("HABITS_DEBUG_SERVER_CLIENT_ID", "")
+            resValue "string", "app_name", "${appName} [DEBUG]"
         }
         release {
             minifyEnabled false

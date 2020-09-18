@@ -1,6 +1,4 @@
 <resources>
-    <string name="app_name">Habits</string>
-
     <string name="pref_first_day_title">Start of the week</string>
     <string name="pref_first_day_saturday">Saturday</string>
     <string name="pref_first_day_sunday">Sunday</string>
