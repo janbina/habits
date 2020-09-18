@@ -1,15 +1,14 @@
 package com.janbina.habits.ui.detail
 
 import android.graphics.Color
-import android.os.Bundle
-import android.view.View
 import androidx.compose.runtime.Composable
 import androidx.core.view.isVisible
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.airbnb.mvrx.fragmentViewModel
+import com.airbnb.mvrx.withState
 import com.janbina.habits.databinding.ItemCalendarDayDetailBinding
 import com.janbina.habits.helpers.DateFormatters
-import com.janbina.habits.ui.base.BaseComposeFragment
+import com.janbina.habits.ui.base.BaseComposeMavericksFragment
 import com.janbina.habits.ui.base.FragmentArgs
 import com.janbina.habits.util.BindingDayBinder
 import com.kizitonwose.calendarview.model.DayOwner
@@ -18,12 +17,12 @@ import kotlinx.android.parcel.Parcelize
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class HabitDetailFragment : BaseComposeFragment() {
+class HabitDetailFragment : BaseComposeMavericksFragment() {
 
     @Inject
     lateinit var dateFormatters: DateFormatters
 
-    private val viewModel: HabitDetailViewModel by viewModels()
+    private val viewModel: HabitDetailViewModel by fragmentViewModel()
 
     @Composable
     override fun content() = HabitDetailScreen(
@@ -32,9 +31,9 @@ class HabitDetailFragment : BaseComposeFragment() {
         binder = dayBinder
     )
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun invalidate() {}
 
+    override fun setupRegistrations() {
         viewModel.handleNavigationEvents()
     }
 
@@ -53,10 +52,12 @@ class HabitDetailFragment : BaseComposeFragment() {
             this.dayText.setTextColor(Color.GRAY)
         }
 
-        if (viewModel.currentState().habitDetail()?.days?.contains(epochDay) == true) {
-            background.isVisible = true
-        } else {
-            background.isVisible = false
+        withState(viewModel) {
+            if (it.habitDetail()?.days?.contains(epochDay) == true) {
+                background.isVisible = true
+            } else {
+                background.isVisible = false
+            }
         }
     }
 

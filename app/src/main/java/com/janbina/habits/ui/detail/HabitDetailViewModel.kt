@@ -1,77 +1,78 @@
 package com.janbina.habits.ui.detail
 
-import androidx.hilt.Assisted
-import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.viewModelScope
-import com.airbnb.mvrx.Async
-import com.airbnb.mvrx.Fail
-import com.airbnb.mvrx.Success
-import com.airbnb.mvrx.Uninitialized
+import com.airbnb.mvrx.*
 import com.github.kittinunf.result.Result
 import com.janbina.habits.R
 import com.janbina.habits.data.repository.DaysRepository
 import com.janbina.habits.data.repository.HabitsRepository
-import com.janbina.habits.ui.base.BaseComposeViewModel
-import com.janbina.habits.ui.base.getArgs
+import com.janbina.habits.di.helpers.AssistedViewModelFactory
+import com.janbina.habits.di.helpers.DaggerVmFactory
+import com.janbina.habits.ui.base.BaseViewModel
 import com.janbina.habits.ui.create.CreateFragment
 import com.janbina.habits.ui.viewevent.NavigationEvent
 import com.kizitonwose.calendarview.model.CalendarMonth
 import com.kizitonwose.calendarview.utils.yearMonth
-import kotlinx.coroutines.launch
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 
 data class HabitDetailState(
+    val id: String,
+    val day: LocalDate,
     val selectedMonth: YearMonth = YearMonth.now(),
     val startMonth: YearMonth = YearMonth.now().minusYears(1),
     val endMonth: YearMonth = YearMonth.now().plusYears(1),
     val habitDetail: Async<HabitsRepository.HabitDetail> = Uninitialized,
     val days: List<DayOfWeek> = DayOfWeek.values().toList()
-)
+) : MavericksState {
 
-class HabitDetailViewModel @ViewModelInject constructor(
-    @Assisted state: SavedStateHandle,
+    @Suppress("unused")
+    constructor(args: HabitDetailFragment.Args): this(
+        id = args.id,
+        day = LocalDate.ofEpochDay(args.day.toLong())
+    )
+}
+
+class HabitDetailViewModel @AssistedInject constructor(
+    @Assisted initialState: HabitDetailState,
     private val habitsRepository: HabitsRepository,
     private val daysRepository: DaysRepository
-) : BaseComposeViewModel<HabitDetailState>(HabitDetailState()) {
+) : BaseViewModel<HabitDetailState>(initialState) {
 
-    private val args = state.getArgs<HabitDetailFragment.Args>()
-    private val day = LocalDate.ofEpochDay(args.day.toLong())
+    private val id = initialState.id
+    private val day = initialState.day
 
     init {
-        viewModelScope.launchSetState {
+        setState {
             copy(
-                selectedMonth = LocalDate.ofEpochDay(args.day.toLong()).yearMonth,
+                selectedMonth = day.yearMonth,
                 days = daysRepository.getDaysOfWeekSorted()
             )
         }
 
-        viewModelScope.launch {
-            habitsRepository.getHabitDetail(args.id)
-                .collectAndSetState {
-                    when (it) {
-                        is Result.Success -> {
-                            copy(
-                                habitDetail = Success(it.value),
-                                startMonth = getStart(it.value),
-                                endMonth = getEnd(it.value),
-                            )
-                        }
-                        is Result.Failure -> {
-                            copy(habitDetail = Fail(it.error))
-                        }
-                    }
+        habitsRepository.getHabitDetail(id).setOnEach {
+            when (it) {
+                is Result.Success -> {
+                    copy(
+                        habitDetail = Success(it.value),
+                        startMonth = getStart(it.value),
+                        endMonth = getEnd(it.value),
+                    )
                 }
+                is Result.Failure -> {
+                    copy(habitDetail = Fail(it.error))
+                }
+            }
         }
     }
 
-    fun monthSelected(calendarMonth: CalendarMonth) = viewModelScope.launchSetState {
+    fun monthSelected(calendarMonth: CalendarMonth) = setState {
         copy(selectedMonth = calendarMonth.yearMonth)
     }
 
-    fun toggleHabitCompletion(day: LocalDate) = viewModelScope.withState {
+    fun toggleHabitCompletion(day: LocalDate) = withState {
         val habit = it.habitDetail() ?: return@withState
         val epochDay = day.toEpochDay().toInt()
         habitsRepository.setHabitComplete(
@@ -82,14 +83,14 @@ class HabitDetailViewModel @ViewModelInject constructor(
     }
 
     fun delete() {
-        habitsRepository.deleteHabit(args.id)
+        habitsRepository.deleteHabit(id)
         NavigationEvent.back().publish()
     }
 
     fun edit() {
         NavigationEvent(
             R.id.createFragment,
-            CreateFragment.Args(args.id).toBundle()
+            CreateFragment.Args(id).toBundle()
         ).publish()
     }
 
@@ -98,7 +99,7 @@ class HabitDetailViewModel @ViewModelInject constructor(
         if (start == null || start.isAfter(day)) {
             start = day
         }
-        return start!!.yearMonth.minusYears(1)
+        return start.yearMonth.minusYears(1)
     }
 
     private fun getEnd(detail: HabitsRepository.HabitDetail): YearMonth {
@@ -106,6 +107,14 @@ class HabitDetailViewModel @ViewModelInject constructor(
         if (end == null || end.isBefore(day)) {
             end = day
         }
-        return end!!.yearMonth.plusYears(1)
+        return end.yearMonth.plusYears(1)
     }
+
+    @AssistedInject.Factory
+    interface Factory : AssistedViewModelFactory<HabitDetailViewModel, HabitDetailState> {
+        override fun create(initialState: HabitDetailState): HabitDetailViewModel
+    }
+
+    companion object :
+        DaggerVmFactory<HabitDetailViewModel, HabitDetailState>(HabitDetailViewModel::class.java)
 }

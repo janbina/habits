@@ -7,9 +7,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -17,7 +19,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.viewinterop.viewModel
 import androidx.core.view.doOnLayout
 import androidx.core.view.updateLayoutParams
 import androidx.navigation.NavController
@@ -29,6 +30,7 @@ import com.janbina.habits.R
 import com.janbina.habits.helpers.DateFormatters
 import com.janbina.habits.helpers.px
 import com.janbina.habits.ui.compose.*
+import com.janbina.habits.util.mavericksViewModelAndStateFragment
 import com.kizitonwose.calendarview.CalendarView
 import com.kizitonwose.calendarview.model.CalendarMonth
 import com.kizitonwose.calendarview.model.InDateStyle
@@ -42,8 +44,7 @@ fun HabitDetailScreen(
     navController: NavController,
     binder: DayBinder<*>
 ) {
-    val viewModel: HabitDetailViewModel = viewModel()
-    val viewState by viewModel.liveData.observeAsState()
+    val (viewModel, viewState) = mavericksViewModelAndStateFragment<HabitDetailViewModel, HabitDetailState>()
 
     var showDeleteDialog by savedInstanceState { false }
 
@@ -51,30 +52,28 @@ fun HabitDetailScreen(
         DateFormatterAmbient provides dateFormatters
     ) {
         HabitsTheme {
-            viewState?.let {
-                Column {
-                    HabitsAppBar(
-                        onNavIconPressed = navController::navigateUp,
-                        actions = {
-                            ToolbarButton(asset = Icons.Filled.Edit, onClick = viewModel::edit)
-                            ToolbarButton(
-                                asset = Icons.Filled.Delete,
-                                onClick = { showDeleteDialog = true }
-                            )
-                        }
-                    )
-                    HabitHeader(it)
-                    DayLegend(it)
-                    Calendar(it, binder, viewModel::monthSelected)
-                }
+            Column {
+                HabitsAppBar(
+                    onNavIconPressed = navController::navigateUp,
+                    actions = {
+                        ToolbarButton(asset = Icons.Filled.Edit, onClick = viewModel::edit)
+                        ToolbarButton(
+                            asset = Icons.Filled.Delete,
+                            onClick = { showDeleteDialog = true }
+                        )
+                    }
+                )
+                HabitHeader(viewState)
+                DayLegend(viewState)
+                Calendar(viewState, binder, viewModel::monthSelected)
+            }
 
-                if (showDeleteDialog) {
-                    DeleteDialog(
-                        state = it,
-                        viewModel = viewModel,
-                        hide = { showDeleteDialog = false }
-                    )
-                }
+            if (showDeleteDialog) {
+                DeleteDialog(
+                    state = viewState,
+                    viewModel = viewModel,
+                    hide = { showDeleteDialog = false }
+                )
             }
         }
     }

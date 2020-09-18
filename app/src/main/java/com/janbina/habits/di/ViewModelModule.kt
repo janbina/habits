@@ -3,6 +3,7 @@ package com.janbina.habits.di
 import com.janbina.habits.di.helpers.AssistedViewModelFactory
 import com.janbina.habits.di.helpers.ViewModelKey
 import com.janbina.habits.ui.LoginViewModel
+import com.janbina.habits.ui.detail.HabitDetailViewModel
 import com.janbina.habits.ui.home.DayViewModel
 import com.janbina.habits.ui.home.HomeViewModel
 import com.janbina.habits.ui.settings.SettingsViewModel
@@ -39,4 +40,9 @@ interface ViewModelModule {
     @IntoMap
     @ViewModelKey(LoginViewModel::class)
     fun loginViewModelFactory(factory: LoginViewModel.Factory): AssistedViewModelFactory<*, *>
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(HabitDetailViewModel::class)
+    fun habitDetailViewModelFactory(factory: HabitDetailViewModel.Factory): AssistedViewModelFactory<*, *>
 }
