@@ -1,31 +1,28 @@
 package com.janbina.habits.ui.create
 
-import android.os.Bundle
-import android.view.View
 import androidx.compose.runtime.Composable
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.janbina.habits.ui.base.BaseComposeFragment
+import com.airbnb.mvrx.fragmentViewModel
+import com.janbina.habits.ui.base.BaseComposeMavericksFragment
 import com.janbina.habits.ui.base.FragmentArgs
-import com.janbina.habits.ui.detail.HabitDetailScreen
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.parcel.Parcelize
 
 @AndroidEntryPoint
-class CreateFragment : BaseComposeFragment() {
+class CreateFragment : BaseComposeMavericksFragment() {
 
-    private val viewModel: CreateViewModelCompose by viewModels()
+    private val viewModel: CreateViewModel by fragmentViewModel()
 
     @Composable
     override fun content() = CreateScreen(
         navController = findNavController()
     )
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+    override fun setupRegistrations() {
         viewModel.handleNavigationEvents()
     }
+
+    override fun invalidate() {}
 
     @Parcelize
     data class Args(
