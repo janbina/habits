@@ -13,7 +13,7 @@ plugins {
 
 ext {
     // tag[-commits-hash] (0.0.1-1-g2e87a07)
-    gitVersionName = "0.0.0-1-xxx" //Grgit.open().describe() ?: "0.0.0-1-xxx"
+    gitVersionName = Grgit.open(currentDir: project.rootDir).describe() ?: "0.0.0-1-xxx"
 
     gitVersionCode = 0
     parts1 = gitVersionName.tokenize('.')
