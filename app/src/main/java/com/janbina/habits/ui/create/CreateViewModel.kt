@@ -1,45 +1,37 @@
 package com.janbina.habits.ui.create
 
-import com.airbnb.mvrx.MavericksState
+import androidx.hilt.lifecycle.ViewModelInject
+import androidx.lifecycle.viewModelScope
 import com.github.kittinunf.result.Result
 import com.janbina.habits.data.repository.HabitsRepository
-import com.janbina.habits.di.helpers.AssistedViewModelFactory
-import com.janbina.habits.di.helpers.DaggerVmFactory
-import com.janbina.habits.ui.base.BaseViewModel
+import com.janbina.habits.ui.base.BaseReduxVM
 import com.janbina.habits.ui.viewevent.NavigationEvent
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.launch
 
 data class CreateState(
     val id: String?,
     val name: String = ""
-) : MavericksState {
+)
 
-    @Suppress("unused")
-    constructor(args: CreateFragment.Args): this(
-        id = args.id
-    )
-}
-
-class CreateViewModel @AssistedInject constructor(
-    @Assisted initialState: CreateState,
+class CreateViewModel @ViewModelInject constructor(
     private val habitsRepository: HabitsRepository
-) : BaseViewModel<CreateState>(initialState) {
+) : BaseReduxVM<CreateState>(CreateState(null)) {
 
-    private val id = initialState.id
+    private val id: String? = null
 
     init {
         loadHabit()
     }
 
-    fun nameChanged(name: String) = setState {
+    fun nameChanged(name: String) = viewModelScope.launchSetState {
         copy(name = name)
     }
 
-    fun save() = withState {
-        habitsRepository.saveHabit(id, it.name)
-        NavigationEvent.back().publish()
+    fun save() = viewModelScope.launch {
+        withState {
+            habitsRepository.saveHabit(id, it.name)
+            NavigationEvent.back().publish()
+        }
     }
 
     private fun loadHabit() = viewModelScope.launch {
@@ -49,12 +41,4 @@ class CreateViewModel @AssistedInject constructor(
             setState { copy(name = habit.value.name) }
         }
     }
-
-    @AssistedInject.Factory
-    interface Factory : AssistedViewModelFactory<CreateViewModel, CreateState> {
-        override fun create(initialState: CreateState): CreateViewModel
-    }
-
-    companion object :
-        DaggerVmFactory<CreateViewModel, CreateState>(CreateViewModel::class.java)
 }

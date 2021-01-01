@@ -1,6 +1,7 @@
 package com.janbina.habits.ui.settings
 
 import android.os.Bundle
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.preference.ListPreference
 import androidx.preference.Preference
@@ -24,14 +25,14 @@ import kotlin.reflect.KProperty0
 class SettingsFragment :
     BasePreferenceFragment<FragmentSettingsBinding>(FragmentSettingsBinding::bind) {
 
-    private val loginViewModel: LoginViewModel by existingViewModel()
+    private val loginViewModel: LoginViewModel by activityViewModels()
 
     @Inject
     lateinit var preferences: Preferences
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         kotprefScreen(preferences) {
-            withState(loginViewModel) { state ->
+            loginViewModel.currentState().also { state ->
                 if (state.user != null) {
                     preference(KEY_LOGGED_USER, "User") {
                         summary = createUserSummary(state.user)
@@ -68,6 +69,15 @@ class SettingsFragment :
     }
 
     override fun setupView() = with(binding) {
+        loginViewModel.liveData.observe(viewLifecycleOwner) {
+            val user = it.user
+            findPreference<Preference>(KEY_LOGGED_USER)?.apply {
+                isVisible = user != null
+                summary = createUserSummary(user)
+            }
+            Unit
+        }
+
         toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
@@ -79,17 +89,8 @@ class SettingsFragment :
         Unit
     }
 
-    override fun invalidate() = withState(loginViewModel) {
-        val user = it.user
-        findPreference<Preference>(KEY_LOGGED_USER)?.apply {
-            isVisible = user != null
-            summary = createUserSummary(user)
-        }
-        Unit
-    }
-
     private fun logout() {
-        val user = withState(loginViewModel) { it.user } ?: return
+        val user = loginViewModel.currentState().user ?: return
         MaterialAlertDialogBuilder(requireContext(), R.style.DeleteAlertDialog)
             .setTitle("Logged in as ${user.name}")
             .setMessage("Do you want to log out?.")

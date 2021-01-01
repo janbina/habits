@@ -6,18 +6,19 @@ import androidx.compose.material.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.VectorAsset
+import androidx.compose.ui.graphics.vector.ImageVector
 
 @Composable
 fun ToolbarButton(
-    asset: VectorAsset,
+    asset: ImageVector,
     modifier: Modifier = Modifier,
     tint: Color = contentColor(),
     onClick: () -> Unit
 ) {
     IconButton(
         modifier = modifier,
-        icon = { Icon(asset = asset, tint = tint) },
         onClick = onClick
-    )
+    ) {
+        androidx.compose.material.Icon(imageVector = asset, tint = tint)
+    }
 }

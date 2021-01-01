@@ -1,26 +1,24 @@
 package com.janbina.habits.ui.home
 
-import com.airbnb.mvrx.MavericksState
+import androidx.core.os.bundleOf
+import androidx.hilt.lifecycle.ViewModelInject
+import androidx.lifecycle.viewModelScope
 import com.janbina.habits.R
-import com.janbina.habits.di.helpers.AssistedViewModelFactory
-import com.janbina.habits.di.helpers.DaggerVmFactory
-import com.janbina.habits.ui.base.BaseViewModel
+import com.janbina.habits.ui.base.BaseReduxVM
 import com.janbina.habits.ui.create.CreateFragment
 import com.janbina.habits.ui.viewevent.NavigationEvent
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 import java.time.LocalDate
 
 data class HomeState(
     val selectedDate: LocalDate = LocalDate.now(),
     val daysShown: List<LocalDate> = (-4L..2L).map { selectedDate.plusDays(it) }
-) : MavericksState
+)
 
-class HomeViewModel @AssistedInject constructor(
-    @Assisted initialState: HomeState,
-) : BaseViewModel<HomeState>(initialState) {
+class HomeViewModel @ViewModelInject constructor(
 
-    fun dateChanged(newDate: LocalDate) = setState {
+) : BaseReduxVM<HomeState>(HomeState()) {
+
+    fun dateChanged(newDate: LocalDate) = viewModelScope.launchSetState {
         copy(selectedDate = newDate)
     }
 
@@ -29,15 +27,6 @@ class HomeViewModel @AssistedInject constructor(
     }
 
     fun goToHabitCreation() {
-        NavigationEvent(R.id.createFragment, CreateFragment.Args()).publish()
+        NavigationEvent(R.id.createFragment, bundleOf()).publish()
     }
-
-    @AssistedInject.Factory
-    interface Factory : AssistedViewModelFactory<HomeViewModel, HomeState> {
-        override fun create(initialState: HomeState): HomeViewModel
-    }
-
-    companion object :
-        DaggerVmFactory<HomeViewModel, HomeState>(HomeViewModel::class.java)
-
 }

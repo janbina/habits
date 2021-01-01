@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -37,14 +38,21 @@ import com.kizitonwose.calendarview.model.InDateStyle
 import com.kizitonwose.calendarview.model.OutDateStyle
 import com.kizitonwose.calendarview.model.ScrollMode
 import com.kizitonwose.calendarview.ui.DayBinder
+import java.time.LocalDate
 
 @Composable
 fun HabitDetailScreen(
     dateFormatters: DateFormatters,
     navController: NavController,
-    binder: DayBinder<*>
+    binder: DayBinder<*>,
+    viewModel: HabitDetailViewModel,
 ) {
-    val (viewModel, viewState) = mavericksViewModelAndStateFragment<HabitDetailViewModel, HabitDetailState>()
+    val viewState by viewModel.liveData.observeAsState(
+        initial = HabitDetailState(
+            "xxx",
+            LocalDate.now()
+        )
+    )
 
     var showDeleteDialog by savedInstanceState { false }
 
@@ -88,10 +96,10 @@ fun DeleteDialog(state: HabitDetailState, viewModel: HabitDetailViewModel, hide:
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
                 modifier = Modifier.fillMaxWidth().padding(end = 8.dp, bottom = 8.dp)
             ) {
-                TextButton(onClick = hide, contentColor = MaterialTheme.colors.onSurface) {
+                TextButton(onClick = hide){//, contentColor = MaterialTheme.colors.onSurface) {
                     Text(text = "Cancel")
                 }
-                TextButton(onClick = viewModel::delete, contentColor = DeleteRed) {
+                TextButton(onClick = viewModel::delete){//, contentColor = DeleteRed) {
                     Text(text = "Delete")
                 }
             }

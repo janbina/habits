@@ -4,11 +4,13 @@ import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.ExperimentalFocus
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focusRequester
 import androidx.compose.ui.text.input.KeyboardType
@@ -18,13 +20,13 @@ import com.janbina.habits.ui.compose.HabitsTheme
 import com.janbina.habits.ui.detail.HabitsAppBar
 import com.janbina.habits.util.mavericksViewModelAndStateFragment
 
-@OptIn(ExperimentalFocus::class)
 @Composable
 fun CreateScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: CreateViewModel,
 ) {
 
-    val (viewModel, viewState) = mavericksViewModelAndStateFragment<CreateViewModel, CreateState>()
+    val viewState by viewModel.liveData.observeAsState(initial = CreateState(null))
 
     val focusRequester = FocusRequester()
 
@@ -48,7 +50,7 @@ fun CreateScreen(
                         text = "Name"
                     )
                 },
-                keyboardType = KeyboardType.Text
+                keyboardOptions = KeyboardOptions(),
             )
         }
     }

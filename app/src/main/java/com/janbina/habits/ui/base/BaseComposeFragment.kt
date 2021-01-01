@@ -14,12 +14,12 @@ import com.airbnb.mvrx.MavericksView
 import com.janbina.habits.ui.viewevent.NavigationEvent
 import kotlinx.coroutines.flow.launchIn
 
-abstract class BaseComposeFragment() : Fragment(), MavericksView {
+abstract class BaseComposeFragment() : Fragment() {
 
     protected open fun setupView() {}
     protected open fun setupRegistrations() {}
 
-    protected fun BaseViewModel<*>.handleNavigationEvents() {
+    protected fun BaseReduxVM<*>.handleNavigationEvents() {
         onEachEvent<NavigationEvent> {
             it.navigate(findNavController())
         }.launchIn(lifecycleScope)

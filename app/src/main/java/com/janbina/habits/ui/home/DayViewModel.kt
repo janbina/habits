@@ -1,19 +1,15 @@
 package com.janbina.habits.ui.home
 
+import androidx.core.os.bundleOf
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.viewModelScope
 import com.airbnb.mvrx.*
-import com.github.kittinunf.result.failure
-import com.github.kittinunf.result.success
 import com.janbina.habits.R
 import com.janbina.habits.data.repository.HabitsRepository
-import com.janbina.habits.di.helpers.AssistedViewModelFactory
-import com.janbina.habits.di.helpers.DaggerVmFactory
 import com.janbina.habits.models.HabitDay
-import com.janbina.habits.ui.base.BaseViewModel
+import com.janbina.habits.ui.base.BaseReduxVM
 import com.janbina.habits.ui.detail.HabitDetailFragment
 import com.janbina.habits.ui.viewevent.NavigationEvent
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -28,37 +24,24 @@ data class DayState(
     )
 }
 
-class DayViewModel @AssistedInject constructor(
-    @Assisted private val initialState: DayState,
+class DayViewModel @ViewModelInject constructor(
     private val habitsRepository: HabitsRepository,
-) : BaseViewModel<DayState>(initialState) {
+) : BaseReduxVM<DayState>(DayState(22, Uninitialized)) {
 
     init {
-        habitsRepository.getHabitsForDay(initialState.day).onEach { habits ->
-            habits.success {
-                setState { copy(habits = Success(it)) }
-            }
-            habits.failure {
-                setState { copy(habits = Fail(it)) }
-            }
+        habitsRepository.getHabitsForDay(currentState().day).onEach { habits ->
+            habits.fold(
+                { setState { copy(habits = Success(it)) } },
+                { setState { copy(habits = Fail(it)) } }
+            )
         }.launchIn(viewModelScope)
     }
 
     fun markHabitAsCompleted(habit: HabitDay, completed: Boolean) {
-        habitsRepository.setHabitComplete(habit.id, initialState.day, completed)
+        habitsRepository.setHabitComplete(habit.id, currentState().day, completed)
     }
 
     fun openHabit(habit: HabitDay) {
-        NavigationEvent(R.id.habitDetailFragment, HabitDetailFragment.Args(
-            habit.id, initialState.day
-        )).publish()
+        NavigationEvent(R.id.habitDetailFragment, bundleOf()).publish()
     }
-
-    @AssistedInject.Factory
-    interface Factory : AssistedViewModelFactory<DayViewModel, DayState> {
-        override fun create(initialState: DayState): DayViewModel
-    }
-
-    companion object :
-        DaggerVmFactory<DayViewModel, DayState>(DayViewModel::class.java)
 }

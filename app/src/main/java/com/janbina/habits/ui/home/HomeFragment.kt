@@ -4,7 +4,10 @@ import android.view.View
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.observe
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.airbnb.mvrx.existingViewModel
 import com.airbnb.mvrx.fragmentViewModel
@@ -28,23 +31,25 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     @Inject
     lateinit var dateFormatters: DateFormatters
-    private val viewModel: HomeViewModel by fragmentViewModel()
-    private val loginViewModel: LoginViewModel by existingViewModel()
-
-    override fun invalidate() = withState(viewModel, loginViewModel) { it, login ->
-        binding.toolbar.title = dateFormatters.formatRelative(it.selectedDate)
-        updateDayStrip(it)
-
-        binding.loginSheet.isVisible = login.loggedIn.not()
-        binding.loginInclude.loginProg.isVisible = login.inProgress
-
-        binding.viewPager.setCurrentItem(
-            it.selectedDate.toEpochDay().toInt(),
-            binding.viewPager.currentItem != 0
-        )
-    }
+    private val viewModel: HomeViewModel by viewModels()
+    private val loginViewModel: LoginViewModel by activityViewModels()
 
     override fun setupRegistrations() {
+        loginViewModel.liveData.observe(viewLifecycleOwner) {
+            binding.loginSheet.isVisible = it.loggedIn.not()
+            binding.loginInclude.loginProg.isVisible = it.inProgress
+        }
+
+        viewModel.liveData.observe(viewLifecycleOwner) {
+            binding.toolbar.title = dateFormatters.formatRelative(it.selectedDate)
+            updateDayStrip(it)
+
+            binding.viewPager.setCurrentItem(
+                it.selectedDate.toEpochDay().toInt(),
+                binding.viewPager.currentItem != 0
+            )
+        }
+
         viewModel.handleNavigationEvents()
 
         loginViewModel.onEachEvent<LoginViewModel.SignInFinishedEvent> {

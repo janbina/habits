@@ -3,17 +3,17 @@ import org.ajoberstar.grgit.Grgit
 plugins {
     id "com.android.application"
     id "kotlin-android"
-    id "kotlin-android-extensions"
+    id "kotlin-parcelize"
     id "kotlin-kapt"
     id "dagger.hilt.android.plugin"
     id "com.google.gms.google-services"
     id "androidx.navigation.safeargs.kotlin"
-    id "com.github.triplet.play"
+//    id "com.github.triplet.play"
 }
 
 ext {
     // tag[-commits-hash] (0.0.1-1-g2e87a07)
-    gitVersionName = Grgit.open().describe() ?: "0.0.0-1-xxx"
+    gitVersionName = "0.0.0-1-xxx" //Grgit.open().describe() ?: "0.0.0-1-xxx"
 
     gitVersionCode = 0
     parts1 = gitVersionName.tokenize('.')
@@ -26,11 +26,11 @@ ext {
     }
 }
 
-play {
-    track = 'internal'
-    defaultToAppBundles = true
-    serviceAccountCredentials = rootProject.file('release/play-account.json')
-}
+//play {
+//    track = 'internal'
+//    defaultToAppBundles = true
+//    serviceAccountCredentials = rootProject.file('release/play-account.json')
+//}
 
 def appName = "Habits"
 
@@ -178,6 +178,6 @@ dependencies {
     implementation "androidx.compose.foundation:foundation-layout:${versions.compose}"
     implementation "androidx.compose.material:material:${versions.compose}"
     implementation "androidx.compose.runtime:runtime-livedata:${versions.compose}"
-    implementation "androidx.ui:ui-tooling:${versions.compose}"
+    implementation "androidx.compose.ui:ui-tooling:${versions.compose}"
     implementation "com.google.android.material:compose-theme-adapter:${versions.compose}"
 }

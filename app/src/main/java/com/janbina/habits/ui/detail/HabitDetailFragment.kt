@@ -1,15 +1,16 @@
 package com.janbina.habits.ui.detail
 
 import android.graphics.Color
+import android.os.Parcelable
 import androidx.compose.runtime.Composable
 import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.withState
 import com.janbina.habits.databinding.ItemCalendarDayDetailBinding
 import com.janbina.habits.helpers.DateFormatters
 import com.janbina.habits.ui.base.BaseComposeFragment
-import com.janbina.habits.ui.base.FragmentArgs
 import com.janbina.habits.util.BindingDayBinder
 import com.kizitonwose.calendarview.model.DayOwner
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,16 +23,15 @@ class HabitDetailFragment : BaseComposeFragment() {
     @Inject
     lateinit var dateFormatters: DateFormatters
 
-    private val viewModel: HabitDetailViewModel by fragmentViewModel()
+    private val viewModel: HabitDetailViewModel by viewModels()
 
     @Composable
     override fun content() = HabitDetailScreen(
         dateFormatters = dateFormatters,
         navController = findNavController(),
-        binder = dayBinder
+        binder = dayBinder,
+        viewModel = viewModel,
     )
-
-    override fun invalidate() {}
 
     override fun setupRegistrations() {
         viewModel.handleNavigationEvents()
@@ -52,7 +52,7 @@ class HabitDetailFragment : BaseComposeFragment() {
             this.dayText.setTextColor(Color.GRAY)
         }
 
-        withState(viewModel) {
+        viewModel.currentState().let {
             if (it.habitDetail()?.days?.contains(epochDay) == true) {
                 background.isVisible = true
             } else {
@@ -65,5 +65,5 @@ class HabitDetailFragment : BaseComposeFragment() {
     data class Args(
         val id: String,
         val day: Int
-    ) : FragmentArgs()
+    ) : Parcelable
 }

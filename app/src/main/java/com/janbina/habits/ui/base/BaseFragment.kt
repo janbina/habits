@@ -13,11 +13,13 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import com.airbnb.mvrx.*
 import com.janbina.habits.ui.viewevent.NavigationEvent
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
+import kotlin.reflect.KProperty1
 
 abstract class BaseFragment<T : ViewBinding>(
     private val inflate: (LayoutInflater, ViewGroup?, Boolean) -> T
-) : Fragment(), MavericksView {
+) : Fragment() {
 
     private var _binding: T? = null
     protected val binding get() = _binding!!
@@ -25,7 +27,7 @@ abstract class BaseFragment<T : ViewBinding>(
     protected open fun setupView() {}
     protected open fun setupRegistrations() {}
 
-    protected fun BaseViewModel<*>.handleNavigationEvents() {
+    protected fun BaseReduxVM<*>.handleNavigationEvents() {
         onEachEvent<NavigationEvent> {
             it.navigate(findNavController())
         }.launchIn(lifecycleScope)
@@ -53,10 +55,10 @@ abstract class BaseFragment<T : ViewBinding>(
     }
 }
 
-abstract class FragmentArgs : Parcelable {
-    fun toBundle() = bundleOf(Mavericks.KEY_ARG to this)
-}
-
-inline fun <reified T: FragmentArgs> SavedStateHandle.getArgs(): T {
-    return get<T>(Mavericks.KEY_ARG)!!
-}
+//abstract class FragmentArgs : Parcelable {
+//    fun toBundle() = bundleOf(Mavericks.KEY_ARG to this)
+//}
+//
+//inline fun <reified T: FragmentArgs> SavedStateHandle.getArgs(): T {
+//    return get<T>(Mavericks.KEY_ARG)!!
+//}
