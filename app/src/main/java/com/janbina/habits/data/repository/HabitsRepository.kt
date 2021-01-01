@@ -94,18 +94,20 @@ class HabitsRepository @Inject constructor(
     ): List<HabitDay> {
         return habits.map {
             HabitDay(it.id, it.name, daysResponse.completed.contains(it.id))
-        }.sortedWith(Comparator { a, b ->
-            when {
-                a.completed && b.completed -> a.name.compareTo(b.name)
-                a.completed -> -1
-                b.completed -> 1
-                else -> {
-                    val aCount = daysResponse.counts.getOrDefault(a.id, 0)
-                    val bCount = daysResponse.counts.getOrDefault(b.id, 0)
-                    bCount.compareTo(aCount)
-                }
-            }
-        })
+        }.sortedBy { it.name }
+
+//        .sortedWith(Comparator { a, b ->
+//            when {
+//                a.completed && b.completed -> a.name.compareTo(b.name)
+//                a.completed -> -1
+//                b.completed -> 1
+//                else -> {
+//                    val aCount = daysResponse.counts.getOrDefault(a.id, 0)
+//                    val bCount = daysResponse.counts.getOrDefault(b.id, 0)
+//                    bCount.compareTo(aCount)
+//                }
+//            }
+//        })
     }
 
     data class DaysResponse(

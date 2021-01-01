@@ -1,6 +1,7 @@
 package com.janbina.habits.ui.home
 
 import android.os.Parcelable
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,15 +17,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.janbina.habits.di.viewModelProviderFactoryOf
 import com.janbina.habits.models.HabitDay
 import com.janbina.habits.ui.base.BaseComposeFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.parcel.Parcelize
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class DayFragment : BaseComposeFragment() {
 
-    private val viewModel: DayViewModel by viewModels()
+    @Inject
+    internal lateinit var vmFactory: DayViewModel.Factory
+
+    private val viewModel: DayViewModel by viewModels {
+        viewModelProviderFactoryOf {
+            vmFactory.create(requireArguments().getInt(KEY_DAY))
+        }
+    }
 
     override fun setupRegistrations() {
         viewModel.handleNavigationEvents()
@@ -43,8 +55,15 @@ class DayFragment : BaseComposeFragment() {
 
     @Composable
     fun HabitItem(habit: HabitDay) {
-        Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(text = habit.name)
+        Row(
+            modifier = Modifier.clickable(onClick = { viewModel.openHabit(habit) }).fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                modifier = Modifier.weight(1F),
+                text = habit.name
+            )
             Checkbox(
                 checked = habit.completed,
                 onCheckedChange = { viewModel.markHabitAsCompleted(habit, it) }
@@ -52,13 +71,8 @@ class DayFragment : BaseComposeFragment() {
         }
     }
 
-    @Parcelize
-    data class Args(
-        val day: Int,
-    ) : Parcelable
-
     companion object {
-        fun create(args: Args) = DayFragment().apply { arguments = bundleOf() }
+        private const val KEY_DAY = "KEY_DAY"
+        fun create(day: Int) = DayFragment().apply { arguments = bundleOf(KEY_DAY to day) }
     }
 }
-

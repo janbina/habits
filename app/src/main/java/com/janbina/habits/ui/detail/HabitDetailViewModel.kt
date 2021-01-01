@@ -10,9 +10,13 @@ import com.janbina.habits.models.Fail
 import com.janbina.habits.models.Success
 import com.janbina.habits.models.Uninitialized
 import com.janbina.habits.ui.base.BaseReduxVM
+import com.janbina.habits.ui.home.DayState
+import com.janbina.habits.ui.home.DayViewModel
 import com.janbina.habits.ui.viewevent.NavigationEvent
 import com.kizitonwose.calendarview.model.CalendarMonth
 import com.kizitonwose.calendarview.utils.yearMonth
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -28,13 +32,14 @@ data class HabitDetailState(
     val days: List<DayOfWeek> = DayOfWeek.values().toList()
 )
 
-class HabitDetailViewModel @ViewModelInject constructor(
+class HabitDetailViewModel @AssistedInject constructor(
+    @Assisted initialState: HabitDetailState,
     private val habitsRepository: HabitsRepository,
     private val daysRepository: DaysRepository
-) : BaseReduxVM<HabitDetailState>(HabitDetailState("xxx", LocalDate.now())) {
+) : BaseReduxVM<HabitDetailState>(initialState) {
 
-    private val id = "xxx"
-    private val day = LocalDate.now()
+    private val id get() = currentState().id
+    private val day get() = currentState().day
 
     init {
         viewModelScope.launchSetState {
@@ -105,4 +110,16 @@ class HabitDetailViewModel @ViewModelInject constructor(
         }
         return end!!.yearMonth.plusYears(1)
     }
+
+    @AssistedInject.Factory
+    internal interface Factory {
+        fun create(initialState: HabitDetailState): HabitDetailViewModel
+    }
+}
+
+internal fun HabitDetailViewModel.Factory.create(
+    id: String,
+    day: LocalDate,
+): HabitDetailViewModel {
+    return create(HabitDetailState(id = id, day = day))
 }

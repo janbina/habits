@@ -10,18 +10,23 @@ import com.janbina.habits.models.HabitDay
 import com.janbina.habits.models.Uninitialized
 import com.janbina.habits.models.toAsync
 import com.janbina.habits.ui.base.BaseReduxVM
+import com.janbina.habits.ui.detail.HabitDetailFragment
 import com.janbina.habits.ui.viewevent.NavigationEvent
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import java.time.LocalDate
 
 data class DayState(
     val day: Int,
-    val habits: Async<List<HabitDay>>,
+    val habits: Async<List<HabitDay>> = Uninitialized,
 )
 
-class DayViewModel @ViewModelInject constructor(
+class DayViewModel @AssistedInject constructor(
+    @Assisted initialState: DayState,
     private val habitsRepository: HabitsRepository,
-) : BaseReduxVM<DayState>(DayState(22, Uninitialized)) {
+) : BaseReduxVM<DayState>(initialState) {
 
     init {
         habitsRepository.getHabitsForDay(currentState().day).onEach {
@@ -34,6 +39,17 @@ class DayViewModel @ViewModelInject constructor(
     }
 
     fun openHabit(habit: HabitDay) {
-        NavigationEvent(R.id.habitDetailFragment, bundleOf()).publish()
+        NavigationEvent(R.id.habitDetailFragment, HabitDetailFragment.createArgs(habit.id, LocalDate.ofEpochDay(currentState().day.toLong()))).publish()
     }
+
+    @AssistedInject.Factory
+    internal interface Factory {
+        fun create(initialState: DayState): DayViewModel
+    }
+}
+
+internal fun DayViewModel.Factory.create(
+    day: Int
+): DayViewModel {
+    return create(DayState(day = day))
 }
