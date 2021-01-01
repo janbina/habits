@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.janbina.habits.ui.compose.HabitsTheme
 import com.janbina.habits.ui.detail.HabitsAppBar
-import com.janbina.habits.util.mavericksViewModelAndStateFragment
 
 @Composable
 fun CreateScreen(

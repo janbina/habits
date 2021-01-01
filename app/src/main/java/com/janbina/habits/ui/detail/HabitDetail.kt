@@ -24,14 +24,13 @@ import androidx.core.view.doOnLayout
 import androidx.core.view.updateLayoutParams
 import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
-import com.airbnb.mvrx.Fail
-import com.airbnb.mvrx.Incomplete
-import com.airbnb.mvrx.Success
 import com.janbina.habits.R
 import com.janbina.habits.helpers.DateFormatters
 import com.janbina.habits.helpers.px
+import com.janbina.habits.models.Fail
+import com.janbina.habits.models.Incomplete
+import com.janbina.habits.models.Success
 import com.janbina.habits.ui.compose.*
-import com.janbina.habits.util.mavericksViewModelAndStateFragment
 import com.kizitonwose.calendarview.CalendarView
 import com.kizitonwose.calendarview.model.CalendarMonth
 import com.kizitonwose.calendarview.model.InDateStyle
@@ -194,12 +193,12 @@ fun Calendar(
     ) { view ->
         when (state.habitDetail) {
             is Incomplete -> Unit
-            is Success -> {
+            is Success<*> -> {
                 view.layoutManager?.let {
                     view.notifyCalendarChanged()
                 }
             }
-            is Fail -> Unit
+            is Fail<*> -> Unit
         }
 
         view.setup(state.startMonth, state.endMonth, state.days.first())

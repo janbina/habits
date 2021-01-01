@@ -3,7 +3,6 @@ package com.janbina.habits.ui.home
 import android.os.Parcelable
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
-import com.airbnb.mvrx.withState
 import com.janbina.habits.databinding.FragmentDayBinding
 import com.janbina.habits.models.SimpleItem
 import com.janbina.habits.ui.base.BaseFragment

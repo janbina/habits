@@ -4,7 +4,6 @@ import android.os.Parcelable
 import androidx.compose.runtime.Composable
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.airbnb.mvrx.fragmentViewModel
 import com.janbina.habits.ui.base.BaseComposeFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.parcel.Parcelize

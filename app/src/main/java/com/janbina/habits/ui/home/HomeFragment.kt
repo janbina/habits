@@ -9,9 +9,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.airbnb.mvrx.existingViewModel
-import com.airbnb.mvrx.fragmentViewModel
-import com.airbnb.mvrx.withState
 import com.google.android.material.snackbar.Snackbar
 import com.janbina.habits.R
 import com.janbina.habits.databinding.Example7DayBinding

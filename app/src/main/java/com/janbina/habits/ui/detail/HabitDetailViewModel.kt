@@ -2,10 +2,13 @@ package com.janbina.habits.ui.detail
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.viewModelScope
-import com.airbnb.mvrx.*
 import com.github.kittinunf.result.Result
 import com.janbina.habits.data.repository.DaysRepository
 import com.janbina.habits.data.repository.HabitsRepository
+import com.janbina.habits.models.Async
+import com.janbina.habits.models.Fail
+import com.janbina.habits.models.Success
+import com.janbina.habits.models.Uninitialized
 import com.janbina.habits.ui.base.BaseReduxVM
 import com.janbina.habits.ui.viewevent.NavigationEvent
 import com.kizitonwose.calendarview.model.CalendarMonth
