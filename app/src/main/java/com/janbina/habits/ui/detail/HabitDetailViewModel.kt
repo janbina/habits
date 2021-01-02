@@ -1,6 +1,5 @@
 package com.janbina.habits.ui.detail
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.viewModelScope
 import com.github.kittinunf.result.Result
 import com.janbina.habits.data.repository.DaysRepository
@@ -10,8 +9,6 @@ import com.janbina.habits.models.Fail
 import com.janbina.habits.models.Success
 import com.janbina.habits.models.Uninitialized
 import com.janbina.habits.ui.base.BaseReduxVM
-import com.janbina.habits.ui.home.DayState
-import com.janbina.habits.ui.home.DayViewModel
 import com.janbina.habits.ui.viewevent.NavigationEvent
 import com.kizitonwose.calendarview.model.CalendarMonth
 import com.kizitonwose.calendarview.utils.yearMonth
@@ -29,7 +26,9 @@ data class HabitDetailState(
     val startMonth: YearMonth = YearMonth.now().minusYears(1),
     val endMonth: YearMonth = YearMonth.now().plusYears(1),
     val habitDetail: Async<HabitsRepository.HabitDetail> = Uninitialized,
-    val days: List<DayOfWeek> = DayOfWeek.values().toList()
+    val days: List<DayOfWeek> = DayOfWeek.values().toList(),
+    val habitEditationState: HabitEditationState = HabitEditationState(),
+    val habitEditationVisible: Boolean = false,
 )
 
 class HabitDetailViewModel @AssistedInject constructor(
@@ -38,8 +37,8 @@ class HabitDetailViewModel @AssistedInject constructor(
     private val daysRepository: DaysRepository
 ) : BaseReduxVM<HabitDetailState>(initialState) {
 
-    private val id get() = currentState().id
-    private val day get() = currentState().day
+    private val id = initialState.id
+    private val day = initialState.day
 
     init {
         viewModelScope.launchSetState {
@@ -89,10 +88,32 @@ class HabitDetailViewModel @AssistedInject constructor(
     }
 
     fun edit() {
-//        NavigationEvent(
-//            R.id.createFragment,
-//            CreateFragment.Args(id).toBundle()
-//        ).publish()
+        viewModelScope.launchSetState {
+            this.habitDetail()?.habit?.let {
+                copy(habitEditationState = HabitEditationState(it.id, it.name), habitEditationVisible = true)
+            } ?: this
+        }
+    }
+
+    fun updateEdit(editationState: HabitEditationState) = viewModelScope.launchSetState {
+        copy(habitEditationState = editationState)
+    }
+
+    fun cancelEdit() = viewModelScope.launchSetState {
+        copy(habitEditationVisible = false)
+    }
+
+    fun saveEdit() = viewModelScope.launchSetState {
+        if (!habitEditationVisible || !habitEditationState.isValid()) {
+            this
+        } else {
+            habitsRepository.saveHabit(habitEditationState.id, habitEditationState.name)
+            copy(habitEditationVisible = false)
+        }
+    }
+
+    fun archive() {
+
     }
 
     private fun getStart(detail: HabitsRepository.HabitDetail): YearMonth {
@@ -100,7 +121,7 @@ class HabitDetailViewModel @AssistedInject constructor(
         if (start == null || start.isAfter(day)) {
             start = day
         }
-        return start!!.yearMonth.minusYears(1)
+        return start.yearMonth.minusYears(1)
     }
 
     private fun getEnd(detail: HabitsRepository.HabitDetail): YearMonth {
@@ -108,7 +129,7 @@ class HabitDetailViewModel @AssistedInject constructor(
         if (end == null || end.isBefore(day)) {
             end = day
         }
-        return end!!.yearMonth.plusYears(1)
+        return end.yearMonth.plusYears(1)
     }
 
     @AssistedInject.Factory

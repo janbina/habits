@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -56,7 +57,12 @@ class DayFragment : BaseComposeFragment() {
     @Composable
     fun HabitItem(habit: HabitDay) {
         Row(
-            modifier = Modifier.clickable(onClick = { viewModel.openHabit(habit) }).fillMaxWidth()
+            modifier = Modifier
+                .clickable(
+                    indication = rememberRipple(),
+                    onClick = { viewModel.openHabit(habit) }
+                )
+                .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {

@@ -8,6 +8,11 @@ import com.janbina.habits.models.firestore.HabitFirestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import timber.log.Timber
+import java.time.LocalDate
+import java.time.Month
+import java.time.Year
+import java.time.YearMonth
 import javax.inject.Inject
 
 typealias Res<T> = Result<T, Exception>
@@ -52,7 +57,20 @@ class HabitsRepository @Inject constructor(
     data class HabitDetail(
         val habit: HabitFirestore,
         val days: List<Long>
-    )
+    ) {
+        fun thisYearCount(): Int {
+            val year = YearMonth.now().year
+            val firstDay = LocalDate.of(year, Month.JANUARY, 1).toEpochDay()
+            val lastDay = LocalDate.of(year, Month.DECEMBER, 31).toEpochDay()
+            return days.count { it in firstDay..lastDay }
+        }
+
+        fun yearToDateCount(): Int {
+            val today = LocalDate.now()
+            val lastYear = today.minusYears(1)
+            return days.count { it in lastYear.toEpochDay()..today.toEpochDay() }
+        }
+    }
 
     fun getHabitsForDay(day: Int): Flow<Res<List<HabitDay>>> = callbackFlow {
         val subs = TupleQuery(

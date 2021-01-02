@@ -18,8 +18,4 @@
         android:id="@+id/habitDetailFragment"
         android:name="com.janbina.habits.ui.detail.HabitDetailFragment" />
 
-    <fragment
-        android:id="@+id/createFragment"
-        android:name="com.janbina.habits.ui.create.CreateFragment" />
-
 </navigation>

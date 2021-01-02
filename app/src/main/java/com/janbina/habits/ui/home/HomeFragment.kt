@@ -1,18 +1,22 @@
 package com.janbina.habits.ui.home
 
 import android.view.ViewGroup
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.fragment.app.Fragment
@@ -24,14 +28,18 @@ import androidx.viewpager2.widget.ViewPager2
 import com.janbina.habits.helpers.*
 import com.janbina.habits.ui.LoginViewModel
 import com.janbina.habits.ui.base.BaseComposeFragment
+import com.janbina.habits.ui.compose.ToolbarDropdownMenu
 import com.janbina.habits.ui.compose.VerticalSpacer
 import com.janbina.habits.ui.compose.invisible
+import com.janbina.habits.ui.detail.HabitEditation
 import com.janbina.habits.util.onPageSelected
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import java.time.LocalDate
+import java.util.*
 import javax.inject.Inject
 
+@ExperimentalAnimationApi
 @AndroidEntryPoint
 class HomeFragment : BaseComposeFragment() {
 
@@ -78,11 +86,22 @@ class HomeFragment : BaseComposeFragment() {
     override fun content() {
         val _state by viewModel.liveData.observeAsState()
         val state = _state ?: return
+
         Column(modifier = Modifier.fillMaxSize()) {
-            TopAppBar {
-                Text(text = dateFormatters.formatRelative(state.selectedDate))
-            }
+            TopAppBar(
+                title = { Text(text = dateFormatters.formatRelative(state.selectedDate)) },
+                actions = {
+                    ToolbarDropdownMenu(
+                        imageVector = Icons.Default.MoreVert,
+                        items = listOf(
+                            "Create new" to viewModel::createHabit,
+                            "Settings" to viewModel::goToSettings,
+                        ),
+                    )
+                }
+            )
             DayStrip(state = state)
+            Creation(viewModel, state)
             Box(modifier = Modifier.fillMaxSize()) {
                 AndroidView(
                     modifier = Modifier.fillMaxSize(),
@@ -111,6 +130,19 @@ class HomeFragment : BaseComposeFragment() {
     }
 
     @Composable
+    fun ColumnScope.Creation(viewModel: HomeViewModel, state: HomeState) {
+        AnimatedVisibility(visible = state.habitEditationVisible) {
+            HabitEditation(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                state = state.habitEditationState,
+                onStateChange = viewModel::updateCreation,
+                onCancel = viewModel::cancelCreation,
+                onSave = viewModel::saveCreation,
+            )
+        }
+    }
+
+    @Composable
     fun DayStrip(state: HomeState) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -133,19 +165,32 @@ class HomeFragment : BaseComposeFragment() {
         isSelected: Boolean,
         onClick: () -> Unit,
     ) {
-        val color = if (isSelected) Color.Blue else Color.Transparent
+        val fontWeight = if (day == LocalDate.now()) FontWeight.SemiBold else FontWeight.Normal
         Column(
-            modifier = Modifier.clickable(onClick = onClick),
+            modifier = Modifier.clickable(
+                indication = rememberRipple(bounded = false, radius = 32.dp),
+                onClick = onClick
+            ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = dateFormatters.shortDayNameFormatter.format(day))
+            Text(text = dateFormatters.shortDayNameFormatter.format(day).toUpperCase(Locale.US), fontWeight = fontWeight)
             Spacer(modifier = Modifier.preferredHeight(4.dp))
             Box(contentAlignment = Alignment.Center) {
                 Box(
                     modifier = Modifier.preferredSize(30.dp)
-                        .background(color = color, shape = CircleShape)
+                        .background(color = Color.Transparent, shape = CircleShape)
                 )
-                Text(text = dateFormatters.dayNumFormatter.format(day))
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = isSelected,
+                    enter = fadeIn(),// + expandVertically(),
+                    exit = fadeOut(),// + shrinkVertically(),
+                ) {
+                    Box(
+                        modifier = Modifier.preferredSize(30.dp)
+                            .background(color = Color.Blue, shape = CircleShape)
+                    )
+                }
+                Text(text = dateFormatters.dayNumFormatter.format(day), fontWeight = fontWeight)
             }
         }
     }
@@ -161,7 +206,9 @@ class HomeFragment : BaseComposeFragment() {
                 elevation = 8.dp,
             ) {
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth().invisible(state.inProgress.not()))
+                    LinearProgressIndicator(
+                        modifier = Modifier.fillMaxWidth().invisible(state.inProgress.not())
+                    )
                     VerticalSpacer(size = 8.dp)
                     Text(
                         modifier = Modifier.padding(horizontal = 16.dp),

@@ -1,18 +1,15 @@
 package com.janbina.habits.ui.detail
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
-import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -59,18 +56,22 @@ fun HabitDetailScreen(
         DateFormatterAmbient provides dateFormatters
     ) {
         HabitsTheme {
-            Column {
+            ScrollableColumn {
                 HabitsAppBar(
                     onNavIconPressed = navController::navigateUp,
                     actions = {
-                        ToolbarButton(asset = Icons.Filled.Edit, onClick = viewModel::edit)
-                        ToolbarButton(
-                            asset = Icons.Filled.Delete,
-                            onClick = { showDeleteDialog = true }
+                        ToolbarDropdownMenu(
+                            imageVector = Icons.Default.MoreVert,
+                            items = listOf(
+                                "Edit" to viewModel::edit,
+                                "Archive" to viewModel::archive,
+                                "Delete" to { showDeleteDialog = true }
+                            )
                         )
                     }
                 )
-                HabitHeader(viewState)
+                Stats(viewState)
+                HabitHeader(viewModel, viewState)
                 DayLegend(viewState)
                 Calendar(viewState, binder, viewModel::monthSelected)
             }
@@ -83,6 +84,15 @@ fun HabitDetailScreen(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun Stats(viewState: HabitDetailState) {
+    val habitDetail = viewState.habitDetail() ?: return
+    Column {
+        androidx.compose.material.Text(text = "Year to date: ${habitDetail.yearToDateCount()}")
+        androidx.compose.material.Text(text = "This year: ${habitDetail.thisYearCount()}")
     }
 }
 
@@ -135,10 +145,23 @@ fun HabitsAppBar(
 }
 
 @Composable
-fun HabitHeader(state: HabitDetailState) {
-    val habit = state.habitDetail()
+fun HabitHeader(
+    viewModel: HabitDetailViewModel,
+    state: HabitDetailState
+) {
     Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
-        Text(text = habit?.habit?.name ?: "")
+        Crossfade(current = state.habitEditationVisible) {
+            if (it) {
+                HabitEditation(
+                    state = state.habitEditationState,
+                    onStateChange = viewModel::updateEdit,
+                    onCancel = viewModel::cancelEdit,
+                    onSave = viewModel::saveEdit,
+                )
+            } else {
+                Text(text = state.habitDetail()?.habit?.name ?: "")
+            }
+        }
         Text(text = DateFormatterAmbient.current.formatMonthNameOptionalYear(state.selectedMonth))
     }
 }
