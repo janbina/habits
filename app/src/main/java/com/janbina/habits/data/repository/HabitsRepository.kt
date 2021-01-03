@@ -5,13 +5,10 @@ import com.janbina.habits.data.database.FirestoreDb
 import com.janbina.habits.models.HabitDay
 import com.janbina.habits.models.firestore.DayFirestore
 import com.janbina.habits.models.firestore.HabitFirestore
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import timber.log.Timber
+import kotlinx.coroutines.flow.combine
 import java.time.LocalDate
 import java.time.Month
-import java.time.Year
 import java.time.YearMonth
 import javax.inject.Inject
 
@@ -41,20 +38,16 @@ class HabitsRepository @Inject constructor(
         return firestoreDb.getHabit(id).get()
     }
 
-    fun getHabitDetail(id: String): Flow<Res<HabitDetail>> = callbackFlow {
-        val subs = TupleQuery(
-            firestoreDb.getHabit(id),
-            firestoreDb.getDaysWhenHabitCompleted(id)
-        ).addListener { habit, days ->
+    fun getHabitDetail(id: String): Flow<Res<HabitDetail>> {
+        return combine(
+            firestoreDb.getHabit(id).asFlow(),
+            firestoreDb.getDaysWhenHabitCompleted(id).asFlow()
+        ) { habit, days ->
             try {
-                offer(Res.success(HabitDetail(habit.get(), days.get())))
+                Res.success(HabitDetail(habit.get(), days.get()))
             } catch (e: Exception) {
-                offer(Res.error(e))
+                Res.error(e)
             }
-        }
-
-        awaitClose {
-            subs.forEach { it.remove() }
         }
     }
 
@@ -76,20 +69,16 @@ class HabitsRepository @Inject constructor(
         }
     }
 
-    fun getHabitsForDay(day: Int): Flow<Res<HabitsForDay>> = callbackFlow {
-        val subs = TupleQuery(
-            firestoreDb.getDay(day),
-            firestoreDb.getAllHabits()
-        ).addListener { day, habits ->
+    fun getHabitsForDay(day: Int): Flow<Res<HabitsForDay>>  {
+        return combine(
+            firestoreDb.getDay(day).asFlow(),
+            firestoreDb.getAllHabits().asFlow()
+        ) { day, habits ->
             try {
-                offer(Res.success(createHabitsForDay(habits.get(), day.get())))
+                Res.success(createHabitsForDay(habits.get(), day.get()))
             } catch (e: Exception) {
-                offer(Res.error(e))
+                Res.error(e)
             }
-        }
-
-        awaitClose {
-            subs.forEach { it.remove() }
         }
     }
 

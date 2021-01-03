@@ -2,11 +2,15 @@ package com.janbina.habits.data.database
 
 import com.google.firebase.firestore.*
 import com.janbina.habits.data.repository.Res
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 interface MappedResult<T> {
     suspend fun get(): Res<T>
     fun addListener(action: (Res<T>) -> Unit): ListenerRegistration
+    fun asFlow(): Flow<Res<T>>
 }
 
 class MappedQuery<T>(
@@ -32,6 +36,11 @@ class MappedQuery<T>(
             }
         }
     }
+
+    override fun asFlow(): Flow<Res<T>> = callbackFlow {
+        val sub = addListener { offer(it) }
+        awaitClose { sub.remove() }
+    }
 }
 
 class MappedDocument<T>(
@@ -56,6 +65,11 @@ class MappedDocument<T>(
                 action(Res.success(mapper(value)))
             }
         }
+    }
+
+    override fun asFlow(): Flow<Res<T>> = callbackFlow {
+        val sub = addListener { offer(it) }
+        awaitClose { sub.remove() }
     }
 }
 
