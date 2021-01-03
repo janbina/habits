@@ -28,9 +28,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.janbina.habits.helpers.*
 import com.janbina.habits.ui.LoginViewModel
 import com.janbina.habits.ui.base.BaseComposeFragment
-import com.janbina.habits.ui.compose.ToolbarDropdownMenu
-import com.janbina.habits.ui.compose.VerticalSpacer
-import com.janbina.habits.ui.compose.invisible
+import com.janbina.habits.ui.compose.*
 import com.janbina.habits.ui.detail.HabitEditation
 import com.janbina.habits.util.onPageSelected
 import dagger.hilt.android.AndroidEntryPoint
@@ -88,16 +86,43 @@ class HomeFragment : BaseComposeFragment() {
         val state = _state ?: return
 
         Column(modifier = Modifier.fillMaxSize()) {
+            val (menuExpanded, setMenuExpanded) = remember { mutableStateOf(false) }
             TopAppBar(
                 title = { Text(text = dateFormatters.formatRelative(state.selectedDate)) },
                 actions = {
                     ToolbarDropdownMenu(
                         imageVector = Icons.Default.MoreVert,
-                        items = listOf(
-                            "Create new" to viewModel::createHabit,
-                            "Settings" to viewModel::goToSettings,
-                        ),
-                    )
+                        expanded = menuExpanded,
+                        setExpanded = setMenuExpanded,
+                    ) {
+                        SimpleDropdownMenuItem(
+                            text = "Create new",
+                            action = viewModel::createHabit,
+                            setExpanded = setMenuExpanded,
+                        )
+                        DropdownMenuItem(
+                            onClick = {
+                                viewModel.setShowArchived(!state.showArchived)
+                            }
+                        ) {
+                            Row(modifier = Modifier.fillMaxWidth()) {
+                                Text(
+                                    modifier = Modifier.weight(1F),
+                                    text = "Show archived"
+                                )
+                                HorizontalSpacer(size = 16.dp)
+                                Checkbox(
+                                    checked = state.showArchived,
+                                    onCheckedChange = viewModel::setShowArchived
+                                )
+                            }
+                        }
+                        SimpleDropdownMenuItem(
+                            text = "Settings",
+                            action = viewModel::goToSettings,
+                            setExpanded = setMenuExpanded,
+                        )
+                    }
                 }
             )
             DayStrip(state = state)

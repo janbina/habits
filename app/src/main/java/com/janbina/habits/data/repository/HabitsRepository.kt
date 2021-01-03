@@ -25,6 +25,10 @@ class HabitsRepository @Inject constructor(
         firestoreDb.saveHabit(id, HabitFirestore(name = name))
     }
 
+    fun saveHabit(habit: HabitFirestore) {
+        firestoreDb.saveHabit(habit.id, habit)
+    }
+
     fun deleteHabit(id: String) {
         firestoreDb.deleteHabit(id)
     }
@@ -72,13 +76,13 @@ class HabitsRepository @Inject constructor(
         }
     }
 
-    fun getHabitsForDay(day: Int): Flow<Res<List<HabitDay>>> = callbackFlow {
+    fun getHabitsForDay(day: Int): Flow<Res<HabitsForDay>> = callbackFlow {
         val subs = TupleQuery(
-            firestoreDb.getDays(day - 14, day),
+            firestoreDb.getDay(day),
             firestoreDb.getAllHabits()
-        ).addListener { days, habits ->
+        ).addListener { day, habits ->
             try {
-                offer(Res.success(createHabitDays(habits.get(), createDaysResponse(days.get(), day))))
+                offer(Res.success(createHabitsForDay(habits.get(), day.get())))
             } catch (e: Exception) {
                 offer(Res.error(e))
             }
@@ -89,48 +93,74 @@ class HabitsRepository @Inject constructor(
         }
     }
 
-    private fun createDaysResponse(days: List<DayFirestore>, day: Int): DaysResponse {
-        val completed = mutableSetOf<String>()
-        val counts = mutableMapOf<String, Int>()
-
-        days.forEach {
-            if (it.day == day) {
-                completed.addAll(it.completed)
+    private fun createHabitsForDay(
+        allHabits: List<HabitFirestore>,
+        day: DayFirestore?
+    ): HabitsForDay {
+        val completed = day?.completed?.toSet() ?: emptySet()
+        val active = mutableListOf<HabitDay>()
+        val archived = mutableListOf<HabitDay>()
+        allHabits.forEach {
+            val mapped = HabitDay(it.id, it.name, completed.contains(it.id), it.archived)
+            if (mapped.archived && mapped.completed.not()) {
+                archived.add(mapped)
             } else {
-                it.completed.forEach { id ->
-                    counts.merge(id, 14 - day - it.day, Integer::sum)
-                }
+                active.add(mapped)
             }
         }
-
-        return DaysResponse(completed, counts)
+        return HabitsForDay(
+            active.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER, { it.name })),
+            archived.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER, { it.name }))
+        )
     }
 
-    private fun createHabitDays(
-        habits: List<HabitFirestore>,
-        daysResponse: DaysResponse
-    ): List<HabitDay> {
-        return habits.map {
-            HabitDay(it.id, it.name, daysResponse.completed.contains(it.id))
-        }.sortedBy { it.name }
+    data class HabitsForDay(
+        val active: List<HabitDay>,
+        val archived: List<HabitDay>,
+    )
 
-//        .sortedWith(Comparator { a, b ->
-//            when {
-//                a.completed && b.completed -> a.name.compareTo(b.name)
-//                a.completed -> -1
-//                b.completed -> 1
-//                else -> {
-//                    val aCount = daysResponse.counts.getOrDefault(a.id, 0)
-//                    val bCount = daysResponse.counts.getOrDefault(b.id, 0)
-//                    bCount.compareTo(aCount)
+//    private fun createDaysResponse(days: List<DayFirestore>, day: Int): DaysResponse {
+//        val completed = mutableSetOf<String>()
+//        val counts = mutableMapOf<String, Int>()
+//
+//        days.forEach {
+//            if (it.day == day) {
+//                completed.addAll(it.completed)
+//            } else {
+//                it.completed.forEach { id ->
+//                    counts.merge(id, 14 - day - it.day, Integer::sum)
 //                }
 //            }
-//        })
-    }
+//        }
+//
+//        return DaysResponse(completed, counts)
+//    }
+//
+//    private fun createHabitDays(
+//        habits: List<HabitFirestore>,
+//        daysResponse: DaysResponse
+//    ): List<HabitDay> {
+//        return habits.map {
+//            HabitDay(it.id, it.name, daysResponse.completed.contains(it.id))
+//        }.sortedBy { it.name }
+//
+////        .sortedWith(Comparator { a, b ->
+////            when {
+////                a.completed && b.completed -> a.name.compareTo(b.name)
+////                a.completed -> -1
+////                b.completed -> 1
+////                else -> {
+////                    val aCount = daysResponse.counts.getOrDefault(a.id, 0)
+////                    val bCount = daysResponse.counts.getOrDefault(b.id, 0)
+////                    bCount.compareTo(aCount)
+////                }
+////            }
+////        })
+//    }
 
-    data class DaysResponse(
-        val completed: Set<String>,
-        val counts: Map<String, Int>
-    )
+//    data class DaysResponse(
+//        val completed: Set<String>,
+//        val counts: Map<String, Int>
+//    )
 
 }

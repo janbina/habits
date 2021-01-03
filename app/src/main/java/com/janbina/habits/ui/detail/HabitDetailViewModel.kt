@@ -112,8 +112,10 @@ class HabitDetailViewModel @AssistedInject constructor(
         }
     }
 
-    fun archive() {
-
+    fun toggleArchived() = viewModelScope.withState {
+        it.habitDetail()?.habit?.let { habit ->
+            habitsRepository.saveHabit(habit.copy(archived = !habit.archived))
+        }
     }
 
     private fun getStart(detail: HabitsRepository.HabitDetail): YearMonth {

@@ -3,7 +3,7 @@ package com.janbina.habits.data.repository
 import com.google.firebase.firestore.ListenerRegistration
 import com.janbina.habits.data.database.MappedResult
 
-class TupleQuery<A: Any, B: Any>(
+class TupleQuery<A, B>(
     private val aQ: MappedResult<A>,
     private val bQ: MappedResult<B>,
 ) {

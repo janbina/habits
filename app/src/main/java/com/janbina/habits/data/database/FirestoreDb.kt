@@ -79,6 +79,15 @@ class FirestoreDb @Inject constructor(
             }
     }
 
+    fun getDay(day: Int): MappedQuery<DayFirestore?> {
+        return userDaysCollection
+            .whereEqualTo(FIELD_DAY_DAY, day)
+            .limit(1)
+            .withMapper {
+                it.toObjects<DayFirestore>().firstOrNull()
+            }
+    }
+
     fun getAllHabits(): MappedQuery<List<HabitFirestore>> {
         return userHabitsCollection.withMapper { it.toObjects() }
     }

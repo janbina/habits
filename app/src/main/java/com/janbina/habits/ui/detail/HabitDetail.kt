@@ -2,7 +2,6 @@ package com.janbina.habits.ui.detail
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -57,14 +56,18 @@ fun HabitDetailScreen(
     ) {
         HabitsTheme {
             ScrollableColumn {
+                val archiveAction = if (viewState.habitDetail()?.habit?.archived == true) "Restore" else "Archive"
+                val (menuExpanded, setMenuExpanded) = remember { mutableStateOf(false) }
                 HabitsAppBar(
                     onNavIconPressed = navController::navigateUp,
                     actions = {
                         ToolbarDropdownMenu(
                             imageVector = Icons.Default.MoreVert,
+                            expanded = menuExpanded,
+                            setExpanded = setMenuExpanded,
                             items = listOf(
                                 "Edit" to viewModel::edit,
-                                "Archive" to viewModel::archive,
+                                archiveAction to viewModel::toggleArchived,
                                 "Delete" to { showDeleteDialog = true }
                             )
                         )
@@ -74,6 +77,7 @@ fun HabitDetailScreen(
                 HabitHeader(viewModel, viewState)
                 DayLegend(viewState)
                 Calendar(viewState, binder, viewModel::monthSelected)
+                ArchiveInfo(viewModel, viewState)
             }
 
             if (showDeleteDialog) {
@@ -88,11 +92,25 @@ fun HabitDetailScreen(
 }
 
 @Composable
+fun ArchiveInfo(viewModel: HabitDetailViewModel, viewState: HabitDetailState) {
+    val habit = viewState.habitDetail()?.habit ?: return
+    if (!habit.archived) return
+    
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+        Text(text = "Archived")
+        Text(text = "This habit is archived. It will be only displayed on days when you completed it. You can access archive from home screen menu and unarchive any habit from its detail.")
+        OutlinedButton(onClick = viewModel::toggleArchived) {
+            Text(text = "Unarchive")
+        }
+    }
+}
+
+@Composable
 fun Stats(viewState: HabitDetailState) {
     val habitDetail = viewState.habitDetail() ?: return
     Column {
-        androidx.compose.material.Text(text = "Year to date: ${habitDetail.yearToDateCount()}")
-        androidx.compose.material.Text(text = "This year: ${habitDetail.thisYearCount()}")
+        Text(text = "Year to date: ${habitDetail.yearToDateCount()}")
+        Text(text = "This year: ${habitDetail.thisYearCount()}")
     }
 }
 

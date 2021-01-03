@@ -1,9 +1,8 @@
 package com.janbina.habits.ui.home
 
-import androidx.core.os.bundleOf
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.viewModelScope
 import com.janbina.habits.R
+import com.janbina.habits.data.preferences.Datastore
 import com.janbina.habits.data.repository.HabitsRepository
 import com.janbina.habits.models.Async
 import com.janbina.habits.models.HabitDay
@@ -20,17 +19,23 @@ import java.time.LocalDate
 
 data class DayState(
     val day: Int,
-    val habits: Async<List<HabitDay>> = Uninitialized,
+    val habits: Async<HabitsRepository.HabitsForDay> = Uninitialized,
+    val showArchived: Boolean = false,
 )
 
 class DayViewModel @AssistedInject constructor(
     @Assisted initialState: DayState,
     private val habitsRepository: HabitsRepository,
+    private val dataStore: Datastore,
 ) : BaseReduxVM<DayState>(initialState) {
 
     init {
         habitsRepository.getHabitsForDay(currentState().day).onEach {
             setState { copy(habits = it.toAsync(habits())) }
+        }.launchIn(viewModelScope)
+
+        dataStore.isShowArchived.onEach {
+            setState { copy(showArchived = it) }
         }.launchIn(viewModelScope)
     }
 
