@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -17,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
+import com.janbina.habits.ui.compose.HabitsTextField
 import com.janbina.habits.ui.compose.HorizontalSpacer
 
 data class HabitEditationState(
@@ -37,12 +37,11 @@ fun HabitEditation(
     val interactionState = remember {
         InteractionState().apply { addInteraction(Interaction.Focused) }
     }
-
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        OutlinedTextField(
+        HabitsTextField(
             modifier = Modifier.weight(1F),
             value = state.name,
             onValueChange = {
@@ -53,7 +52,7 @@ fun HabitEditation(
                 capitalization = KeyboardCapitalization.Sentences,
                 imeAction = ImeAction.Done,
             ),
-            onImeActionPerformed = { _, _, -> onSave() },
+            onImeActionPerformed = { onSave() },
             singleLine = true,
         )
         HorizontalSpacer(size = 4.dp)
