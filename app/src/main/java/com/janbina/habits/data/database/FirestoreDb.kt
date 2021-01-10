@@ -1,17 +1,15 @@
 package com.janbina.habits.data.database
 
-import com.google.firebase.firestore.*
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.firestore.ktx.toObjects
 import com.janbina.habits.data.repository.AuthRepository
-import com.janbina.habits.data.repository.Res
 import com.janbina.habits.models.Habit
 import com.janbina.habits.models.RawDay
 import com.janbina.habits.models.firestore.DayFirestore
 import com.janbina.habits.models.firestore.HabitFirestore
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -65,12 +63,10 @@ class FirestoreDb @Inject constructor(
             }
     }
 
-    override fun getDay(day: Long): MappedQuery<RawDay> {
-        return userDaysCollection
-            .whereEqualTo(FIELD_DAY_DAY, day)
-            .limit(1)
+    override fun getDay(day: Long): MappedResult<RawDay> {
+        return userDaysCollection.document(day.toString())
             .withMapper {
-                it.toObjects<DayFirestore>().firstOrNull()?.toRawDay() ?: RawDay(day, emptyList())
+                it.toObject<DayFirestore>()?.toRawDay() ?: RawDay(day, emptyList())
             }
     }
 
@@ -81,7 +77,6 @@ class FirestoreDb @Inject constructor(
     }
 
     companion object {
-        private const val FIELD_DAY_DAY = "day"
         private const val FIELD_DAY_COMPLETED = "completed"
     }
 }
