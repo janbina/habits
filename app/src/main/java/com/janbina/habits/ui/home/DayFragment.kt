@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Checkbox
-import androidx.compose.material.ListItem
 import androidx.compose.material.Text
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
@@ -19,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import com.janbina.habits.di.viewModelProviderFactoryOf
-import com.janbina.habits.models.HabitDay
+import com.janbina.habits.models.HabitOnDay
 import com.janbina.habits.ui.base.BaseComposeFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -32,7 +31,7 @@ class DayFragment : BaseComposeFragment() {
 
     private val viewModel: DayViewModel by viewModels {
         viewModelProviderFactoryOf {
-            vmFactory.create(requireArguments().getInt(KEY_DAY))
+            vmFactory.create(requireArguments().getLong(KEY_DAY))
         }
     }
 
@@ -61,7 +60,7 @@ class DayFragment : BaseComposeFragment() {
     }
 
     @Composable
-    fun HabitItem(habit: HabitDay) {
+    fun HabitItem(habit: HabitOnDay) {
         Row(
             modifier = Modifier
                 .clickable(
@@ -85,6 +84,6 @@ class DayFragment : BaseComposeFragment() {
 
     companion object {
         private const val KEY_DAY = "KEY_DAY"
-        fun create(day: Int) = DayFragment().apply { arguments = bundleOf(KEY_DAY to day) }
+        fun create(day: Long) = DayFragment().apply { arguments = bundleOf(KEY_DAY to day) }
     }
 }

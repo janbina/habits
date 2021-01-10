@@ -1,18 +1,18 @@
-package com.janbina.habits.models.firestore
+package com.janbina.habits.models.realtimedb
 
-import com.google.firebase.firestore.DocumentId
+import com.google.firebase.database.IgnoreExtraProperties
 import com.janbina.habits.models.Habit
 
-data class HabitFirestore(
-    @DocumentId
+@IgnoreExtraProperties
+data class HabitRealtimeDb(
     val id: String = "",
     val name: String = "",
     val archived: Boolean = false,
 ) {
     constructor(habit: Habit): this(
-        id = habit.id,
-        name = habit.name,
-        archived = habit.archived
+        habit.id,
+        habit.name,
+        habit.archived,
     )
 
     fun toHabit() = Habit(

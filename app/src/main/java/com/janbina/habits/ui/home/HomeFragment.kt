@@ -290,5 +290,5 @@ class HomeFragment : BaseComposeFragment() {
 
 private class ViewPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
     override fun getItemCount() = Int.MAX_VALUE
-    override fun createFragment(position: Int) = DayFragment.create(position)
+    override fun createFragment(position: Int) = DayFragment.create(position.toLong())
 }

@@ -4,10 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.janbina.habits.R
 import com.janbina.habits.data.preferences.Datastore
 import com.janbina.habits.data.repository.HabitsRepository
-import com.janbina.habits.models.Async
-import com.janbina.habits.models.HabitDay
-import com.janbina.habits.models.Uninitialized
-import com.janbina.habits.models.toAsync
+import com.janbina.habits.models.*
 import com.janbina.habits.ui.base.BaseReduxVM
 import com.janbina.habits.ui.detail.HabitDetailFragment
 import com.janbina.habits.ui.viewevent.NavigationEvent
@@ -18,8 +15,8 @@ import kotlinx.coroutines.flow.onEach
 import java.time.LocalDate
 
 data class DayState(
-    val day: Int,
-    val habits: Async<HabitsRepository.HabitsForDay> = Uninitialized,
+    val day: Long,
+    val habits: Async<Day> = Uninitialized,
     val showArchived: Boolean = false,
 )
 
@@ -39,11 +36,11 @@ class DayViewModel @AssistedInject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun markHabitAsCompleted(habit: HabitDay, completed: Boolean) {
+    fun markHabitAsCompleted(habit: HabitOnDay, completed: Boolean) {
         habitsRepository.setHabitComplete(habit.id, currentState().day, completed)
     }
 
-    fun openHabit(habit: HabitDay) {
+    fun openHabit(habit: HabitOnDay) {
         NavigationEvent(R.id.habitDetailFragment, HabitDetailFragment.createArgs(habit.id, LocalDate.ofEpochDay(currentState().day.toLong()))).publish()
     }
 
@@ -54,7 +51,7 @@ class DayViewModel @AssistedInject constructor(
 }
 
 internal fun DayViewModel.Factory.create(
-    day: Int
+    day: Long,
 ): DayViewModel {
     return create(DayState(day = day))
 }

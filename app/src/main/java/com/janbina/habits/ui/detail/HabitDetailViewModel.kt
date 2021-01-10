@@ -4,10 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.kittinunf.result.Result
 import com.janbina.habits.data.repository.DaysRepository
 import com.janbina.habits.data.repository.HabitsRepository
-import com.janbina.habits.models.Async
-import com.janbina.habits.models.Fail
-import com.janbina.habits.models.Success
-import com.janbina.habits.models.Uninitialized
+import com.janbina.habits.models.*
 import com.janbina.habits.ui.base.BaseReduxVM
 import com.janbina.habits.ui.viewevent.NavigationEvent
 import com.kizitonwose.calendarview.model.CalendarMonth
@@ -25,7 +22,7 @@ data class HabitDetailState(
     val selectedMonth: YearMonth = YearMonth.now(),
     val startMonth: YearMonth = YearMonth.now().minusYears(1),
     val endMonth: YearMonth = YearMonth.now().plusYears(1),
-    val habitDetail: Async<HabitsRepository.HabitDetail> = Uninitialized,
+    val habitDetail: Async<HabitDetail> = Uninitialized,
     val days: List<DayOfWeek> = DayOfWeek.values().toList(),
     val habitEditationState: HabitEditationState = HabitEditationState(),
     val habitEditationVisible: Boolean = false,
@@ -73,11 +70,11 @@ class HabitDetailViewModel @AssistedInject constructor(
     fun toggleHabitCompletion(day: LocalDate) = viewModelScope.launch {
         withState {
             val habit = it.habitDetail() ?: return@withState
-            val epochDay = day.toEpochDay().toInt()
+            val epochDay = day.toEpochDay()
             habitsRepository.setHabitComplete(
                 habit.habit.id,
                 epochDay,
-                habit.days.contains(epochDay.toLong()).not()
+                habit.days.contains(epochDay).not()
             )
         }
     }
@@ -118,7 +115,7 @@ class HabitDetailViewModel @AssistedInject constructor(
         }
     }
 
-    private fun getStart(detail: HabitsRepository.HabitDetail): YearMonth {
+    private fun getStart(detail: HabitDetail): YearMonth {
         var start = detail.days.firstOrNull()?.let { LocalDate.ofEpochDay(it) }
         if (start == null || start.isAfter(day)) {
             start = day
@@ -126,7 +123,7 @@ class HabitDetailViewModel @AssistedInject constructor(
         return start.yearMonth.minusYears(1)
     }
 
-    private fun getEnd(detail: HabitsRepository.HabitDetail): YearMonth {
+    private fun getEnd(detail: HabitDetail): YearMonth {
         var end = detail.days.lastOrNull()?.let { LocalDate.ofEpochDay(it) }
         if (end == null || end.isBefore(day)) {
             end = day

@@ -147,6 +147,8 @@ dependencies {
     implementation "com.google.firebase:firebase-core:18.0.0"
     implementation "com.google.firebase:firebase-auth-ktx:20.0.1"
     implementation 'com.google.firebase:firebase-firestore-ktx:22.0.1'
+    implementation "com.google.firebase:firebase-database-ktx:19.6.0"
+
     implementation "com.google.android.gms:play-services-auth:19.0.0"
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
 

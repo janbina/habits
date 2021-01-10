@@ -1,47 +1,49 @@
 package com.janbina.habits.data.repository
 
 import com.github.kittinunf.result.Result
-import com.janbina.habits.data.database.FirestoreDb
-import com.janbina.habits.models.HabitDay
-import com.janbina.habits.models.firestore.DayFirestore
-import com.janbina.habits.models.firestore.HabitFirestore
+import com.janbina.habits.data.database.Database
+import com.janbina.habits.data.database.IdGenerator
+import com.janbina.habits.models.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import java.time.LocalDate
-import java.time.Month
-import java.time.YearMonth
 import javax.inject.Inject
+import javax.inject.Singleton
 
 typealias Res<T> = Result<T, Exception>
 
+@Singleton
 class HabitsRepository @Inject constructor(
-    private val firestoreDb: FirestoreDb,
+    private val database: Database,
 ) {
 
     fun saveHabit(id: String?, name: String) {
-        firestoreDb.saveHabit(id, HabitFirestore(name = name))
+        database.saveHabit(Habit(
+            id = id ?: IdGenerator.generate(),
+            name = name,
+            archived = false,
+        ))
     }
 
-    fun saveHabit(habit: HabitFirestore) {
-        firestoreDb.saveHabit(habit.id, habit)
+    fun saveHabit(habit: Habit) {
+        database.saveHabit(habit)
     }
 
     fun deleteHabit(id: String) {
-        firestoreDb.deleteHabit(id)
+        database.deleteHabit(id)
     }
 
-    fun setHabitComplete(id: String, day: Int, completed: Boolean) {
-        firestoreDb.changeHabitCompletionForDay(id, day, completed)
+    fun setHabitComplete(id: String, day: Long, completed: Boolean) {
+        database.changeHabitCompletionForDay(id, day, completed)
     }
 
-    suspend fun getHabitInfo(id: String): Res<HabitFirestore> {
-        return firestoreDb.getHabit(id).get()
+    suspend fun getHabitInfo(id: String): Res<Habit> {
+        return database.getHabit(id).get()
     }
 
     fun getHabitDetail(id: String): Flow<Res<HabitDetail>> {
         return combine(
-            firestoreDb.getHabit(id).asFlow(),
-            firestoreDb.getDaysWhenHabitCompleted(id).asFlow()
+            database.getHabit(id).asFlow(),
+            database.getDaysWhenHabitCompleted(id).asFlow()
         ) { habit, days ->
             try {
                 Res.success(HabitDetail(habit.get(), days.get()))
@@ -51,28 +53,12 @@ class HabitsRepository @Inject constructor(
         }
     }
 
-    data class HabitDetail(
-        val habit: HabitFirestore,
-        val days: List<Long>
-    ) {
-        fun thisYearCount(): Int {
-            val year = YearMonth.now().year
-            val firstDay = LocalDate.of(year, Month.JANUARY, 1).toEpochDay()
-            val lastDay = LocalDate.of(year, Month.DECEMBER, 31).toEpochDay()
-            return days.count { it in firstDay..lastDay }
-        }
 
-        fun yearToDateCount(): Int {
-            val today = LocalDate.now()
-            val lastYear = today.minusYears(1)
-            return days.count { it in lastYear.toEpochDay()..today.toEpochDay() }
-        }
-    }
 
-    fun getHabitsForDay(day: Int): Flow<Res<HabitsForDay>>  {
+    fun getHabitsForDay(day: Long): Flow<Res<Day>>  {
         return combine(
-            firestoreDb.getDay(day).asFlow(),
-            firestoreDb.getAllHabits().asFlow()
+            database.getDay(day).asFlow(),
+            database.getAllHabits().asFlow(),
         ) { day, habits ->
             try {
                 Res.success(createHabitsForDay(habits.get(), day.get()))
@@ -83,30 +69,27 @@ class HabitsRepository @Inject constructor(
     }
 
     private fun createHabitsForDay(
-        allHabits: List<HabitFirestore>,
-        day: DayFirestore?
-    ): HabitsForDay {
-        val completed = day?.completed?.toSet() ?: emptySet()
-        val active = mutableListOf<HabitDay>()
-        val archived = mutableListOf<HabitDay>()
+        allHabits: List<Habit>,
+        day: RawDay,
+    ): Day {
+        val completed = day.completed.toSet()
+        val active = mutableListOf<HabitOnDay>()
+        val archived = mutableListOf<HabitOnDay>()
         allHabits.forEach {
-            val mapped = HabitDay(it.id, it.name, completed.contains(it.id), it.archived)
+            val mapped = HabitOnDay(it.id, it.name, completed.contains(it.id), it.archived)
             if (mapped.archived && mapped.completed.not()) {
                 archived.add(mapped)
             } else {
                 active.add(mapped)
             }
         }
-        return HabitsForDay(
+        return Day(
             active.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER, { it.name })),
             archived.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER, { it.name }))
         )
     }
 
-    data class HabitsForDay(
-        val active: List<HabitDay>,
-        val archived: List<HabitDay>,
-    )
+
 
 //    private fun createDaysResponse(days: List<DayFirestore>, day: Int): DaysResponse {
 //        val completed = mutableSetOf<String>()
