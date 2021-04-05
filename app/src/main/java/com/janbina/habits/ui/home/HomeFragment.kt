@@ -2,6 +2,7 @@ package com.janbina.habits.ui.home
 
 import android.view.ViewGroup
 import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontWeight
@@ -81,7 +83,7 @@ class HomeFragment : BaseComposeFragment() {
     }
 
     @Composable
-    override fun content() {
+    override fun Content() {
         val _state by viewModel.liveData.observeAsState()
         val state = _state ?: return
 
@@ -200,15 +202,15 @@ class HomeFragment : BaseComposeFragment() {
         ) {
             Text(text = dateFormatters.shortDayNameFormatter.format(day).toUpperCase(Locale.US), fontWeight = fontWeight)
             Spacer(modifier = Modifier.preferredHeight(4.dp))
-            Box(contentAlignment = Alignment.Center) {
-                Box(
-                    modifier = Modifier.preferredSize(30.dp)
-                        .background(color = Color.Transparent, shape = CircleShape)
-                )
+            Box(
+                modifier = Modifier.preferredSize(30.dp),
+                contentAlignment = Alignment.Center
+            ) {
                 androidx.compose.animation.AnimatedVisibility(
+                    modifier = Modifier.clip(CircleShape),
                     visible = isSelected,
-                    enter = fadeIn(),// + expandVertically(),
-                    exit = fadeOut(),// + shrinkVertically(),
+                    enter = expandIn(expandFrom = Alignment.Center),
+                    exit = shrinkOut(shrinkTowards = Alignment.Center),
                 ) {
                     Box(
                         modifier = Modifier.preferredSize(30.dp)

@@ -52,7 +52,7 @@ fun HabitDetailScreen(
     var showDeleteDialog by savedInstanceState { false }
 
     Providers(
-        DateFormatterAmbient provides dateFormatters
+        AmbientDateFormatter provides dateFormatters
     ) {
         HabitsTheme {
             ScrollableColumn {
@@ -180,7 +180,7 @@ fun HabitHeader(
                 Text(text = state.habitDetail()?.habit?.name ?: "")
             }
         }
-        Text(text = DateFormatterAmbient.current.formatMonthNameOptionalYear(state.selectedMonth))
+        Text(text = AmbientDateFormatter.current.formatMonthNameOptionalYear(state.selectedMonth))
     }
 }
 
@@ -193,7 +193,7 @@ fun DayLegend(state: HabitDetailState) {
             Text(
                 modifier = Modifier.weight(1F),
                 textAlign = TextAlign.Center,
-                text = DateFormatterAmbient.current.shortDayNameFormatter.format(it).toUpperCase(),
+                text = AmbientDateFormatter.current.shortDayNameFormatter.format(it).toUpperCase(),
                 style = MaterialTheme.typography.body1.copy(
                     fontSize = 10.sp,
                     fontFamily = RubikFontFamily,

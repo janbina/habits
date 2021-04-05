@@ -38,7 +38,7 @@ class HabitDetailFragment : BaseComposeFragment() {
     }
 
     @Composable
-    override fun content() = HabitDetailScreen(
+    override fun Content() = HabitDetailScreen(
         dateFormatters = dateFormatters,
         navController = findNavController(),
         binder = dayBinder,

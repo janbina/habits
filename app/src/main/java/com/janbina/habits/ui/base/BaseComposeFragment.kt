@@ -9,10 +9,11 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.janbina.habits.ui.compose.HabitsTheme
 import com.janbina.habits.ui.viewevent.NavigationEvent
 import kotlinx.coroutines.flow.launchIn
 
-abstract class BaseComposeFragment() : Fragment() {
+abstract class BaseComposeFragment : Fragment() {
 
     protected open fun setupView() {}
     protected open fun setupRegistrations() {}
@@ -29,12 +30,16 @@ abstract class BaseComposeFragment() : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         return ComposeView(requireContext()).apply {
-            setContent { content() }
+            setContent {
+                HabitsTheme {
+                    this@BaseComposeFragment.Content()
+                }
+            }
         }
     }
 
     @Composable
-    protected abstract fun content()
+    protected abstract fun Content()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

@@ -1,10 +1,7 @@
 package com.janbina.habits.ui.home
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
@@ -20,6 +17,7 @@ import androidx.fragment.app.viewModels
 import com.janbina.habits.di.viewModelProviderFactoryOf
 import com.janbina.habits.models.HabitOnDay
 import com.janbina.habits.ui.base.BaseComposeFragment
+import com.janbina.habits.ui.compose.CustomCheckbox
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -40,7 +38,7 @@ class DayFragment : BaseComposeFragment() {
     }
 
     @Composable
-    override fun content() {
+    override fun Content() {
         val state by viewModel.liveData.observeAsState()
         val habits = state?.habits?.invoke() ?: return
         LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -75,7 +73,7 @@ class DayFragment : BaseComposeFragment() {
                 modifier = Modifier.weight(1F),
                 text = habit.name
             )
-            Checkbox(
+            CustomCheckbox(
                 checked = habit.completed,
                 onCheckedChange = { viewModel.markHabitAsCompleted(habit, it) }
             )

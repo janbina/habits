@@ -63,7 +63,7 @@ val HabitsTypography = Typography(
         lineHeight = 24.sp
     ),
     body2 = TextStyle(
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
         letterSpacing = 0.25.sp
     ),
