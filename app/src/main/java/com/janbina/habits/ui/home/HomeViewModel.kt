@@ -1,26 +1,38 @@
 package com.janbina.habits.ui.home
 
-import com.airbnb.mvrx.MavericksState
+import androidx.hilt.lifecycle.ViewModelInject
+import androidx.lifecycle.viewModelScope
 import com.janbina.habits.R
-import com.janbina.habits.di.helpers.AssistedViewModelFactory
-import com.janbina.habits.di.helpers.DaggerVmFactory
-import com.janbina.habits.ui.base.BaseViewModel
-import com.janbina.habits.ui.create.CreateFragment
+import com.janbina.habits.data.preferences.Datastore
+import com.janbina.habits.data.repository.HabitsRepository
+import com.janbina.habits.ui.base.BaseReduxVM
+import com.janbina.habits.ui.detail.HabitEditationState
 import com.janbina.habits.ui.viewevent.NavigationEvent
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 data class HomeState(
     val selectedDate: LocalDate = LocalDate.now(),
-    val daysShown: List<LocalDate> = (-4L..2L).map { selectedDate.plusDays(it) }
-) : MavericksState
+    val daysShown: List<LocalDate> = (-4L..2L).map { selectedDate.plusDays(it) },
+    val habitEditationState: HabitEditationState = HabitEditationState(),
+    val habitEditationVisible: Boolean = false,
+    val showArchived: Boolean = false,
+)
 
-class HomeViewModel @AssistedInject constructor(
-    @Assisted initialState: HomeState,
-) : BaseViewModel<HomeState>(initialState) {
+class HomeViewModel @ViewModelInject constructor(
+    private val habitsRepository: HabitsRepository,
+    private val dataStore: Datastore,
+) : BaseReduxVM<HomeState>(HomeState()) {
 
-    fun dateChanged(newDate: LocalDate) = setState {
+    init {
+        dataStore.isShowArchived.onEach {
+            setState { copy(showArchived = it) }
+        }.launchIn(viewModelScope)
+    }
+
+    fun dateChanged(newDate: LocalDate) = viewModelScope.launchSetState {
         copy(selectedDate = newDate)
     }
 
@@ -28,16 +40,30 @@ class HomeViewModel @AssistedInject constructor(
         NavigationEvent(R.id.settingsFragment).publish()
     }
 
-    fun goToHabitCreation() {
-        NavigationEvent(R.id.createFragment, CreateFragment.Args()).publish()
+    fun createHabit() {
+        viewModelScope.launchSetState {
+            copy(habitEditationState = HabitEditationState(), habitEditationVisible = true)
+        }
     }
 
-    @AssistedInject.Factory
-    interface Factory : AssistedViewModelFactory<HomeViewModel, HomeState> {
-        override fun create(initialState: HomeState): HomeViewModel
+    fun updateCreation(editationState: HabitEditationState) = viewModelScope.launchSetState {
+        copy(habitEditationState = editationState)
     }
 
-    companion object :
-        DaggerVmFactory<HomeViewModel, HomeState>(HomeViewModel::class.java)
+    fun cancelCreation() = viewModelScope.launchSetState {
+        copy(habitEditationVisible = false)
+    }
 
+    fun saveCreation() = viewModelScope.launchSetState {
+        if (!habitEditationState.isValid()) {
+            copy(habitEditationVisible = false)
+        } else {
+            habitsRepository.saveHabit(habitEditationState.id, habitEditationState.name)
+            copy(habitEditationVisible = false)
+        }
+    }
+
+    fun setShowArchived(value: Boolean) = viewModelScope.launch {
+        dataStore.setShowArchived(value)
+    }
 }

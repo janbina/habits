@@ -1,23 +1,18 @@
 package com.janbina.habits.ui.settings
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.viewModelScope
-import com.airbnb.mvrx.MavericksState
 import com.janbina.habits.data.repository.AuthRepository
 import com.janbina.habits.data.repository.HabitsRepository
-import com.janbina.habits.di.helpers.AssistedViewModelFactory
-import com.janbina.habits.di.helpers.DaggerVmFactory
-import com.janbina.habits.ui.base.BaseViewModel
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
+import com.janbina.habits.ui.base.BaseReduxVM
 import kotlinx.coroutines.launch
 
-data class SettingsState(val x: String = "") : MavericksState
+data class SettingsState(val x: String = "")
 
-class SettingsViewModel @AssistedInject constructor(
-    @Assisted initialState: SettingsState,
+class SettingsViewModel @ViewModelInject constructor(
     private val authRepository: AuthRepository,
     private val habitsRepository: HabitsRepository
-) : BaseViewModel<SettingsState>(initialState) {
+) : BaseReduxVM<SettingsState>(SettingsState()) {
 
 
     fun loginAnonymously() {
@@ -29,13 +24,5 @@ class SettingsViewModel @AssistedInject constructor(
 //            }
         }
     }
-
-    @AssistedInject.Factory
-    interface Factory : AssistedViewModelFactory<SettingsViewModel, SettingsState> {
-        override fun create(initialState: SettingsState): SettingsViewModel
-    }
-
-    companion object :
-        DaggerVmFactory<SettingsViewModel, SettingsState>(SettingsViewModel::class.java)
 
 }

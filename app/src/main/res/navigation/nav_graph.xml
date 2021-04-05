@@ -7,18 +7,7 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.janbina.habits.ui.home.HomeFragment"
-        tools:layout="@layout/fragment_home" >
-        <action
-            android:id="@+id/toSettingsFragment"
-            app:destination="@id/settingsFragment" />
-        <action
-            android:id="@+id/toCreateFragment"
-            app:destination="@id/createFragment" />
-        <action
-            android:id="@+id/toHabitDetailFragment"
-            app:destination="@id/habitDetailFragment" />
-    </fragment>
+        android:name="com.janbina.habits.ui.home.HomeFragment" />
 
     <fragment
         android:id="@+id/settingsFragment"
@@ -26,13 +15,7 @@
         tools:layout="@layout/fragment_settings" />
 
     <fragment
-        android:id="@+id/createFragment"
-        android:name="com.janbina.habits.ui.create.CreateFragment"
-        tools:layout="@layout/fragment_create" />
-
-    <fragment
         android:id="@+id/habitDetailFragment"
-        android:name="com.janbina.habits.ui.detail.HabitDetailFragment"
-        tools:layout="@layout/fragment_habit_detail" />
+        android:name="com.janbina.habits.ui.detail.HabitDetailFragment" />
 
 </navigation>

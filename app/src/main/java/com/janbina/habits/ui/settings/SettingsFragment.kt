@@ -5,7 +5,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.preference.ListPreference
 import androidx.preference.Preference
-import com.airbnb.mvrx.withState
 import com.chibatching.kotpref.preference.dsl.PreferenceScreenBuilder
 import com.chibatching.kotpref.preference.dsl.kotprefScreen
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -31,7 +30,7 @@ class SettingsFragment :
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         kotprefScreen(preferences) {
-            withState(loginViewModel) { state ->
+            loginViewModel.currentState().also { state ->
                 if (state.user != null) {
                     preference(KEY_LOGGED_USER, "User") {
                         summary = createUserSummary(state.user)
@@ -55,14 +54,28 @@ class SettingsFragment :
                     .toTypedArray()
             }
             category("About") {
+                val versionName = if (BuildConfig.BUILD_TYPE == "release") {
+                    BuildConfig.VERSION_NAME
+                } else {
+                    "${BuildConfig.VERSION_NAME} (${BuildConfig.BUILD_TYPE})"
+                }
                 preference(KEY_VERSION, "Version") {
-                    summary = BuildConfig.VERSION_NAME
+                    summary = versionName
                 }
             }
         }
     }
 
     override fun setupView() = with(binding) {
+        loginViewModel.liveData.observe(viewLifecycleOwner) {
+            val user = it.user
+            findPreference<Preference>(KEY_LOGGED_USER)?.apply {
+                isVisible = user != null
+                summary = createUserSummary(user)
+            }
+            Unit
+        }
+
         toolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
@@ -74,17 +87,8 @@ class SettingsFragment :
         Unit
     }
 
-    override fun invalidate() = withState(loginViewModel) {
-        val user = it.user
-        findPreference<Preference>(KEY_LOGGED_USER)?.apply {
-            isVisible = user != null
-            summary = createUserSummary(user)
-        }
-        Unit
-    }
-
     private fun logout() {
-        val user = withState(loginViewModel) { it.user } ?: return
+        val user = loginViewModel.currentState().user ?: return
         MaterialAlertDialogBuilder(requireContext(), R.style.DeleteAlertDialog)
             .setTitle("Logged in as ${user.name}")
             .setMessage("Do you want to log out?.")

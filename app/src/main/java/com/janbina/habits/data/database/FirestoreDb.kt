@@ -1,13 +1,15 @@
 package com.janbina.habits.data.database
 
-import com.google.android.gms.tasks.Task
-import com.google.firebase.firestore.*
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.firestore.ktx.toObjects
 import com.janbina.habits.data.repository.AuthRepository
+import com.janbina.habits.models.Habit
+import com.janbina.habits.models.RawDay
 import com.janbina.habits.models.firestore.DayFirestore
 import com.janbina.habits.models.firestore.HabitFirestore
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -15,80 +17,66 @@ import javax.inject.Singleton
 class FirestoreDb @Inject constructor(
     private val firestore: FirebaseFirestore,
     private val authRepository: AuthRepository,
-) {
+) : Database {
 
     private val userId get() = authRepository.getUser()?.uid ?: "dummy"
 
-    private val userDocument get() = firestore.collection(PATH_USERS).document(userId)
-    private val userHabitsCollection get() = userDocument.collection(PATH_HABITS)
-    private val userDaysCollection get() = userDocument.collection(PATH_DAYS)
+    private val userDocument get() = firestore.collection("users").document(userId)
+    private val userHabitsCollection get() = userDocument.collection("habits")
+    private val userDaysCollection get() = userDocument.collection("days")
 
-    private fun userDayDocument(day: Int) = userDaysCollection.document(day.toString())
+    private fun userDayDocument(day: Long) = userDaysCollection.document(day.toString())
 
-    fun saveHabit(id: String?, habit: HabitFirestore): Task<Void> {
-        val ref = if (id != null) {
-            userHabitsCollection.document(id)
-        } else {
-            userHabitsCollection.document()
+    override fun saveHabit(habit: Habit) {
+        userHabitsCollection.document(habit.id).set(HabitFirestore(habit))
+    }
+
+    override fun deleteHabit(id: String) {
+        userHabitsCollection.document(id).delete()
+    }
+
+    override fun getHabit(id: String): MappedResult<Habit> {
+        return userHabitsCollection.document(id).withMapper {
+            it.toObject<HabitFirestore>()?.toHabit() ?: error("Missing/invalid habit")
         }
-
-        return ref.set(habit)
     }
 
-    fun deleteHabit(id: String): Task<Void> {
-        return userHabitsCollection.document(id).delete()
-    }
-
-    fun getHabit(id:String): MappedDocument<HabitFirestore> {
-        return userHabitsCollection.document(id).withMapper { it.toObject()!! }
-    }
-
-    fun changeHabitCompletionForDay(id: String, day: Int, completed: Boolean): Task<Void> {
+    override fun changeHabitCompletionForDay(id: String, day: Long, completed: Boolean) {
         val fieldValue = if (completed) {
             FieldValue.arrayUnion(id)
         } else {
             FieldValue.arrayRemove(id)
         }
-        return userDayDocument(day).set(
+        userDayDocument(day).set(
             mapOf(
-                FIELD_DAY_DAY to day,
                 FIELD_DAY_COMPLETED to fieldValue
             ),
             SetOptions.merge()
         )
     }
 
-    fun getDaysWhenHabitCompleted(id: String): MappedQuery<List<Long>> {
+    override fun getDaysWhenHabitCompleted(id: String): MappedResult<List<Long>> {
         return userDaysCollection
             .whereArrayContains(FIELD_DAY_COMPLETED, id)
             .withMapper {
-                Timber.e("ID: $id")
-                Timber.e("SIZE: ${it.size()}")
-                it.map {
-                    it.getLong(FIELD_DAY_DAY)!!
-                }
+                it.map { it.id.toLong() }
             }
     }
 
-    fun getDays(from: Int, to: Int): MappedQuery<List<DayFirestore>> {
-        return userDaysCollection
-            .whereGreaterThanOrEqualTo(FIELD_DAY_DAY, from)
-            .whereLessThanOrEqualTo(FIELD_DAY_DAY, to)
+    override fun getDay(day: Long): MappedResult<RawDay> {
+        return userDaysCollection.document(day.toString())
             .withMapper {
-                it.toObjects()
+                it.toObject<DayFirestore>()?.toRawDay() ?: RawDay(day, emptyList())
             }
     }
 
-    fun getAllHabits(): MappedQuery<List<HabitFirestore>> {
-        return userHabitsCollection.withMapper { it.toObjects() }
+    override fun getAllHabits(): MappedResult<List<Habit>> {
+        return userHabitsCollection.withMapper {
+            it.toObjects<HabitFirestore>().map { it.toHabit() }
+        }
     }
 
     companion object {
-        private const val PATH_USERS = "users"
-        private const val PATH_HABITS = "habits"
-        private const val PATH_DAYS = "days"
-
-        private const val FIELD_DAY_DAY = "day"
         private const val FIELD_DAY_COMPLETED = "completed"
     }
 }

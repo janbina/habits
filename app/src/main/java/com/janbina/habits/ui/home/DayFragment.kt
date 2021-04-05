@@ -1,44 +1,87 @@
 package com.janbina.habits.ui.home
 
-import com.airbnb.mvrx.fragmentViewModel
-import com.airbnb.mvrx.withState
-import com.janbina.habits.databinding.FragmentDayBinding
-import com.janbina.habits.models.SimpleItem
-import com.janbina.habits.ui.base.BaseFragment
-import com.janbina.habits.ui.base.FragmentArgs
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.Checkbox
+import androidx.compose.material.Text
+import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.core.os.bundleOf
+import androidx.fragment.app.viewModels
+import com.janbina.habits.di.viewModelProviderFactoryOf
+import com.janbina.habits.models.HabitOnDay
+import com.janbina.habits.ui.base.BaseComposeFragment
+import com.janbina.habits.ui.compose.CustomCheckbox
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.parcel.Parcelize
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class DayFragment : BaseFragment<FragmentDayBinding>(FragmentDayBinding::inflate) {
+class DayFragment : BaseComposeFragment() {
 
-    private val viewModel: DayViewModel by fragmentViewModel()
+    @Inject
+    internal lateinit var vmFactory: DayViewModel.Factory
+
+    private val viewModel: DayViewModel by viewModels {
+        viewModelProviderFactoryOf {
+            vmFactory.create(requireArguments().getLong(KEY_DAY))
+        }
+    }
 
     override fun setupRegistrations() {
         viewModel.handleNavigationEvents()
     }
 
-    override fun invalidate() = withState(viewModel) {
-        it.habits()?.let {
-            binding.recycler.withModels {
-                it.forEach { habit ->
-                    SimpleItem(
-                        habit,
-                        { completed -> viewModel.markHabitAsCompleted(habit, completed) },
-                        { viewModel.openHabit(habit) }
-                    ).id(habit.id).addTo(this)
+    @Composable
+    override fun Content() {
+        val state by viewModel.liveData.observeAsState()
+        val habits = state?.habits?.invoke() ?: return
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            items(habits.active) {
+                HabitItem(habit = it)
+            }
+
+            if (state?.showArchived == true && habits.archived.isNotEmpty()) {
+                item {
+                    Text(text = "Archived")
+                }
+                items(habits.archived) {
+                    HabitItem(habit = it)
                 }
             }
-        } ?: Unit
+        }
     }
 
-    @Parcelize
-    data class Args(
-        val day: Int,
-    ) : FragmentArgs()
+    @Composable
+    fun HabitItem(habit: HabitOnDay) {
+        Row(
+            modifier = Modifier
+                .clickable(
+                    indication = rememberRipple(),
+                    onClick = { viewModel.openHabit(habit) }
+                )
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                modifier = Modifier.weight(1F),
+                text = habit.name
+            )
+            CustomCheckbox(
+                checked = habit.completed,
+                onCheckedChange = { viewModel.markHabitAsCompleted(habit, it) }
+            )
+        }
+    }
 
     companion object {
-        fun create(args: Args) = DayFragment().apply { arguments = args.toBundle() }
+        private const val KEY_DAY = "KEY_DAY"
+        fun create(day: Long) = DayFragment().apply { arguments = bundleOf(KEY_DAY to day) }
     }
 }
-

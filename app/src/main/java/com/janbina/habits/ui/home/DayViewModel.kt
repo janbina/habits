@@ -1,68 +1,57 @@
 package com.janbina.habits.ui.home
 
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.fragment.findNavController
-import com.airbnb.mvrx.*
-import com.github.kittinunf.result.failure
-import com.github.kittinunf.result.success
 import com.janbina.habits.R
+import com.janbina.habits.data.preferences.Datastore
 import com.janbina.habits.data.repository.HabitsRepository
-import com.janbina.habits.di.helpers.AssistedViewModelFactory
-import com.janbina.habits.di.helpers.DaggerVmFactory
-import com.janbina.habits.models.HabitDay
-import com.janbina.habits.ui.base.BaseViewModel
+import com.janbina.habits.models.*
+import com.janbina.habits.ui.base.BaseReduxVM
 import com.janbina.habits.ui.detail.HabitDetailFragment
 import com.janbina.habits.ui.viewevent.NavigationEvent
-import com.janbina.habits.ui.viewevent.ViewEvent
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 data class DayState(
-    val day: Int,
-    val habits: Async<List<HabitDay>>,
-) : MavericksState {
-    @Suppress("unused")
-    constructor(args: DayFragment.Args) : this(
-        args.day,
-        Uninitialized
-    )
-}
+    val day: Long,
+    val habits: Async<Day> = Uninitialized,
+    val showArchived: Boolean = false,
+)
 
 class DayViewModel @AssistedInject constructor(
-    @Assisted private val initialState: DayState,
+    @Assisted initialState: DayState,
     private val habitsRepository: HabitsRepository,
-) : BaseViewModel<DayState>(initialState) {
+    private val dataStore: Datastore,
+) : BaseReduxVM<DayState>(initialState) {
 
     init {
-        habitsRepository.getHabitsForDay(initialState.day).onEach { habits ->
-            habits.success {
-                setState { copy(habits = Success(it)) }
-            }
-            habits.failure {
-                setState { copy(habits = Fail(it)) }
-            }
+        habitsRepository.getHabitsForDay(currentState().day).onEach {
+            setState { copy(habits = it.toAsync(habits())) }
+        }.launchIn(viewModelScope)
+
+        dataStore.isShowArchived.onEach {
+            setState { copy(showArchived = it) }
         }.launchIn(viewModelScope)
     }
 
-    fun markHabitAsCompleted(habit: HabitDay, completed: Boolean) {
-        habitsRepository.setHabitComplete(habit.id, initialState.day, completed)
+    fun markHabitAsCompleted(habit: HabitOnDay, completed: Boolean) {
+        habitsRepository.setHabitComplete(habit.id, currentState().day, completed)
     }
 
-    fun openHabit(habit: HabitDay) {
-        NavigationEvent(R.id.habitDetailFragment, HabitDetailFragment.Args(
-            habit.id, initialState.day
-        )).publish()
+    fun openHabit(habit: HabitOnDay) {
+        NavigationEvent(R.id.habitDetailFragment, HabitDetailFragment.createArgs(habit.id, LocalDate.ofEpochDay(currentState().day.toLong()))).publish()
     }
 
     @AssistedInject.Factory
-    interface Factory : AssistedViewModelFactory<DayViewModel, DayState> {
-        override fun create(initialState: DayState): DayViewModel
+    internal interface Factory {
+        fun create(initialState: DayState): DayViewModel
     }
+}
 
-    companion object :
-        DaggerVmFactory<DayViewModel, DayState>(DayViewModel::class.java)
+internal fun DayViewModel.Factory.create(
+    day: Long,
+): DayViewModel {
+    return create(DayState(day = day))
 }

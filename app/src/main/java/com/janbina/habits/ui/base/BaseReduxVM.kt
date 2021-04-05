@@ -1,11 +1,9 @@
 package com.janbina.habits.ui.base
 
-import com.airbnb.mvrx.MavericksState
-import com.airbnb.mvrx.MavericksViewModel
 import com.janbina.habits.ui.viewevent.ViewEvent
 import kotlinx.coroutines.flow.*
 
-abstract class BaseViewModel<S : MavericksState>(initialState: S) : MavericksViewModel<S>(initialState) {
+abstract class BaseReduxVM<S>(initialState: S) : ReduxViewModel<S>(initialState) {
 
     private val _viewEvents = MutableStateFlow<ViewEvent?>(null)
     val viewEvents: StateFlow<ViewEvent?> get() = _viewEvents
@@ -28,4 +26,5 @@ abstract class BaseViewModel<S : MavericksState>(initialState: S) : MavericksVie
                 action(it)
             }
     }
+
 }

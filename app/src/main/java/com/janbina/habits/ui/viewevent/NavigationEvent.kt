@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.annotation.IdRes
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
-import com.janbina.habits.ui.base.FragmentArgs
 
 abstract class NavigationEvent : ViewEvent() {
 
@@ -16,9 +15,6 @@ abstract class NavigationEvent : ViewEvent() {
                 override fun getActionId() = actionId
                 override fun getArguments() = arguments
             })
-
-        operator fun invoke(@IdRes actionId: Int, args: FragmentArgs) =
-            invoke(actionId, args.toBundle())
 
         fun back() = UpNavigationEvent()
     }
